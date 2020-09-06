@@ -116,6 +116,8 @@ uint8_t BufferFetcher::fetch() {
 /**
  *  Fetch bytes to buffer.
  * 
+ *  @note
+ *      Nothing would be done if destination size is zero.
  *  @throw BufferException
  *      Riased if the buffer fetcher was ended (XAPCORE_BUF_ERROR_OVERFLOW).
  *  @param destination
@@ -130,6 +132,8 @@ size_t BufferFetcher::fetch_to(Buffer &destination) {
 /**
  *  Fetch bytes to buffer.
  * 
+ *  @note
+ *      Nothing would be done if destination size is zero.
  *  @throw BufferException
  *      Raised if the buffer fetcher was ended (XAPCORE_BUF_ERROR_OVERFLOW).
  *  @param destination
@@ -143,6 +147,10 @@ size_t BufferFetcher::fetch_to(
     Buffer &destination, 
     const size_t destination_offset
 ) {
+    if (destination.get_length() == 0) {
+        return 0U;
+    }
+
     this->assert_not_eof();
 
     size_t copy_len = this->m_buffer->copy(
@@ -157,11 +165,11 @@ size_t BufferFetcher::fetch_to(
 /**
  *  Fetch all bytes in buffer.
  * 
+ *  @note
+ *      Return zero-size buffer if fetcher is ended.
  *  @throw BufferException
  *      Raised in the following situations:
  * 
- *          - XAPCORE_BUF_ERROR_OVERFLOW:
- *              The buffer fetcher was ended.
  *          - XAPCORE_BUF_ERROR_ALLOC: 
  *              Raised if memory allocation was failed.
  * 
@@ -169,7 +177,9 @@ size_t BufferFetcher::fetch_to(
  *      The destination buffer.
  */
 Buffer BufferFetcher::fetch_all() {
-    this->assert_not_eof();
+    if (this->is_end()) {
+        return Buffer(0);
+    }
     
     Buffer out = this->m_buffer->slice(this->m_cursor);
     this->m_cursor += out.get_length();
@@ -183,8 +193,7 @@ Buffer BufferFetcher::fetch_all() {
  *      Raised in the following situations:
  * 
  *          - XAPCORE_BUF_ERROR_OVERFLOW:
- *              The buffer fetcher was ended or parameter 'count' was out of 
- *              range.
+ *              Parameter 'count' was out of range.
  *          - XAPCORE_BUF_ERROR_ALLOC: 
  *              Raised if memory allocation was failed.
  *      
@@ -194,7 +203,9 @@ Buffer BufferFetcher::fetch_all() {
  *      The destination count.
  */
 Buffer BufferFetcher::fetch_bytes(const size_t count) {
-    this->assert_not_eof();
+    if (count == 0U) {
+        return Buffer(0);
+    }
 
     const size_t remaining = this->get_remaining_size();
     if (count > remaining) {
@@ -212,13 +223,19 @@ Buffer BufferFetcher::fetch_bytes(const size_t count) {
 /**
  *  Skip bytes.
  * 
+ *  @note
+ *      Nothing would be done if 'count' = 0U.
  *  @throw BufferException
- *      Raised if buffer fetcher was ended or parameter 'buffer' was out of
- *      range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *      Raised if parameter 'buffer' was out of range 
+ *      (XAPCORE_BUF_ERROR_OVERFLOW).
  *  @param count
  *      The count of bytes would be skiped.
  */
 void BufferFetcher::skip(const size_t count) {
+    if (count == 0U) {
+        return;
+    }
+
     this->assert_not_eof();
 
     const size_t remaining = this->get_remaining_size();
@@ -238,7 +255,7 @@ void BufferFetcher::skip(const size_t count) {
  *  @return
  *      The remaining size.
  */
-size_t BufferFetcher::get_remaining_size() noexcept {
+size_t BufferFetcher::get_remaining_size() const noexcept {
     return this->m_buffer_length - this->m_cursor;
 }
 

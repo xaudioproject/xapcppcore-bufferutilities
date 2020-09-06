@@ -62,6 +62,6 @@ add_test(
 )
 
 #  Timeout.
-set_tests_properties(xaptest-buffer PROPERTIES TIMEOUT 1)
-set_tests_properties(xaptest-fetcher PROPERTIES TIMEOUT 1)
-set_tests_properties(xaptest-queue PROPERTIES TIMEOUT 1)
+set_tests_properties(xaptest-buffer PROPERTIES TIMEOUT 3)
+set_tests_properties(xaptest-fetcher PROPERTIES TIMEOUT 3)
+set_tests_properties(xaptest-queue PROPERTIES TIMEOUT 3)

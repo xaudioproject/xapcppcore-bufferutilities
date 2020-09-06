@@ -55,13 +55,10 @@ int main() {
         fetcher.fetch();
     });
     xap::test::assert_throw<xap::core::buffer::BufferException>([&] {
-        fetcher.fetch_all();
-    });
-    xap::test::assert_throw<xap::core::buffer::BufferException>([&] {
         fetcher.fetch_bytes(1U);
     });
     xap::test::assert_throw<xap::core::buffer::BufferException>([&] {
-        xap::core::buffer::Buffer buf(0);
+        xap::core::buffer::Buffer buf(1U);
         fetcher.fetch_to(buf);
     });
     xap::test::assert_throw<xap::core::buffer::BufferException>([&] {

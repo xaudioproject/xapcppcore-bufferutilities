@@ -96,6 +96,8 @@ public:
     /**
      *  Fetch bytes to buffer.
      * 
+     *  @note
+     *      Nothing would be done if destination size is zero.
      *  @throw BufferException
      *      Riased if the buffer fetcher was ended (XAPCORE_BUF_ERROR_OVERFLOW).
      *  @param destination
@@ -108,6 +110,8 @@ public:
     /**
      *  Fetch bytes to buffer.
      * 
+     *  @note
+     *      Nothing would be done if destination size is zero.
      *  @throw BufferException
      *      Raised if the buffer fetcher was ended (XAPCORE_BUF_ERROR_OVERFLOW).
      *  @param destination  
@@ -122,11 +126,11 @@ public:
     /**
      *  Fetch all bytes in buffer.
      * 
+     *  @note
+     *      Return zero-size buffer if fetcher is ended.
      *  @throw BufferException
      *      Raised in the following situations:
      * 
-     *          - XAPCORE_BUF_ERROR_OVERFLOW:
-     *              The buffer fetcher was ended.
      *          - XAPCORE_BUF_ERROR_ALLOC: 
      *              Raised if memory allocation was failed.
      * 
@@ -142,8 +146,7 @@ public:
      *      Raised in the following situations:
      * 
      *          - XAPCORE_BUF_ERROR_OVERFLOW:
-     *              The buffer fetcher was ended or parameter 'count' was out of 
-     *              range.
+     *              Parameter 'count' was out of range.
      *          - XAPCORE_BUF_ERROR_ALLOC: 
      *              Raised if memory allocation was failed.
      * 
@@ -157,9 +160,11 @@ public:
     /**
      *  Skip bytes.
      * 
+     *  @note
+     *      Nothing would be done if 'count' = 0U.
      *  @throw BufferException
-     *      Raised if buffer fetcher was ended or parameter 'buffer' was out of
-     *      range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *      Raised if parameter 'buffer' was out of range 
+     *      (XAPCORE_BUF_ERROR_OVERFLOW).
      *  @param count
      *      The count of bytes would be skiped.
      */
@@ -171,7 +176,7 @@ public:
      *  @return
      *      The remaining size.
      */
-    size_t get_remaining_size() noexcept;
+    size_t get_remaining_size() const noexcept;
 
     /**
      *  Replace (reset) the fetch with another new buffer.

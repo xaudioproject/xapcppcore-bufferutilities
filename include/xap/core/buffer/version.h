@@ -1,0 +1,10 @@
+//
+//  Copyright 2019 - 2020 The XOrange Studio. All rights reserved.
+//  Use of this source code is governed by a BSD-style license that can be
+//  found in the LICENSE.md file.
+//
+
+//
+//  Version.
+//
+#define XAP_CORE_BUFFER_VERSION "1.0.0-alpha1"

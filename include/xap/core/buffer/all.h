@@ -10,3 +10,5 @@
 #include <xap/core/buffer/buffer.h>
 #include <xap/core/buffer/error.h>
 #include <xap/core/buffer/fetcher.h>
+#include <xap/core/buffer/queue.h>
+#include <xap/core/buffer/version.h>

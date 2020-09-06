@@ -4,7 +4,12 @@
 //  found in the LICENSE.md file.
 //
 
+#ifndef XAPCORE_BUFFER_VERSION_H__
+#define XAPCORE_BUFFER_VERSION_H__
+
 //
 //  Version.
 //
 #define XAP_CORE_BUFFER_VERSION "1.0.0-alpha1"
+
+#endif  //  #ifndef XAPCORE_BUFFER_VERSION_H__

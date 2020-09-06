@@ -74,6 +74,10 @@ int main() {
         dst == buf.slice(0U, 3U),
         "fetch_bytes(3U): dst != buf.slice(0U, 3U)"
     );
+    xap::test::assert_ok(
+        fetcher.get_remaining_size() == 5U,
+        "fetcher.get_remaining_size() != 5U"
+    );
 
     fetcher.reset();
     fetcher.skip(1U);

@@ -32,9 +32,18 @@ add_executable(
     ${CMAKE_BINARY_DIR}/src/buffer.cc
     ${CMAKE_BINARY_DIR}/src/fetcher.cc
 )
+add_executable(
+    queue-unittest
+    queue.unittest.cc
+    ${CMAKE_BINARY_DIR}/src/error.cc
+    ${CMAKE_BINARY_DIR}/src/buffer.cc
+    ${CMAKE_BINARY_DIR}/src/fetcher.cc
+    ${CMAKE_BINARY_DIR}/src/queue.cc
+)
 
 add_executable_dependencies(buffer-unittest)
 add_executable_dependencies(fetcher-unittest)
+add_executable_dependencies(queue-unittest)
 
 add_test(
     NAME                xaptest-buffer
@@ -46,7 +55,13 @@ add_test(
     COMMAND             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/fetcher-unittest
     WORKING_DIRECTORY   ${CMAKE_BINARY_DIR}
 )
+add_test(
+    NAME                xaptest-queue
+    COMMAND             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/queue-unittest
+    WORKING_DIRECTORY   ${CMAKE_BINARY_DIR}
+)
 
 #  Timeout.
 set_tests_properties(xaptest-buffer PROPERTIES TIMEOUT 1)
 set_tests_properties(xaptest-fetcher PROPERTIES TIMEOUT 1)
+set_tests_properties(xaptest-queue PROPERTIES TIMEOUT 1)

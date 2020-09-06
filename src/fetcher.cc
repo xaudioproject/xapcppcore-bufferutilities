@@ -205,7 +205,7 @@ Buffer BufferFetcher::fetch_bytes(const size_t count) {
     }
 
     Buffer out = this->m_buffer->slice(this->m_cursor, count);
-    this->m_cursor += remaining;
+    this->m_cursor += count;
     return out;
 }
 

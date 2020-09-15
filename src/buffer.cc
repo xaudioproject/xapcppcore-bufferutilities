@@ -60,7 +60,7 @@ Buffer::Buffer(const size_t length) {
             data = new uint8_t[length];
         }
         std::shared_ptr<uint8_t> buffer(data, buffer_free_space);
-        this->prepare(buffer, 0, length);
+        this->prepare(buffer, 0U, length);
         this->fill(0x00);
     } catch (std::bad_alloc &error) {
         throw BufferException(error.what(), XAPCORE_BUF_ERROR_ALLOC);
@@ -81,7 +81,7 @@ Buffer::Buffer(const size_t length, const bool unsafe) {
     try {
         uint8_t *data = new uint8_t[length];
         std::shared_ptr<uint8_t> buffer(data, buffer_free_space);
-        this->prepare(buffer, 0, length);
+        this->prepare(buffer, 0U, length);
         if (!unsafe) {
             this->fill(0x00);
         }
@@ -105,7 +105,7 @@ Buffer::Buffer(const uint8_t *data, const size_t datalen) {
         uint8_t *inner = new uint8_t[datalen];
         memcpy(inner, data, datalen);
         std::shared_ptr<uint8_t> buffer(inner, buffer_free_space);
-        this->prepare(buffer, 0, datalen);
+        this->prepare(buffer, 0U, datalen);
     } catch (std::bad_alloc &error) {
         throw BufferException(error.what(), XAPCORE_BUF_ERROR_ALLOC);
     }
@@ -406,7 +406,7 @@ uint16_t Buffer::read_uint16_be(const size_t offset) const {
     this->check_access(offset, 2U);
     return (uint16_t)(
         ((uint16_t)(this->m_bufferstart[offset]) << 8U) |
-        ((uint16_t)(this->m_bufferstart[offset + 1]))
+        ((uint16_t)(this->m_bufferstart[offset + 1U]))
     );
 }
 
@@ -633,13 +633,13 @@ bool Buffer::is_equal(
  *      The new buffer.
  */
 Buffer Buffer::concat(const Buffer buffers[], const size_t count) {
-    size_t datalen = 0;
+    size_t datalen = 0U;
     for (size_t i = 0U; i < count; ++i) {
         datalen += buffers[i].get_length();
     }
     
     Buffer rst(datalen, true);
-    size_t cursor = 0;
+    size_t cursor = 0U;
     for (size_t i = 0U; i < count; ++i) {
         buffers[i].copy(rst, cursor);
         cursor += buffers[i].get_length();

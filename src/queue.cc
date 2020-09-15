@@ -17,7 +17,7 @@ namespace buffer {
  *  Construct the object.
  */
 BufferQueue::BufferQueue() noexcept :
-    m_remaining(0),
+    m_remaining(0U),
     m_queue()
 {
     //  Do nothing.

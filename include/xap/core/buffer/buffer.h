@@ -269,7 +269,7 @@ public:
      *  @return
      *      The unsigned 8-bit integer value.
      */
-    uint8_t read_uint8(const size_t offset = 0) const;
+    uint8_t read_uint8(const size_t offset = 0U) const;
     
     /**
      *  Read an unsigned 16-bit integer with big-endian.
@@ -281,7 +281,7 @@ public:
      *  @return
      *      The unsigned 16-bit integer with big-endian.
      */
-    uint16_t read_uint16_be(const size_t offset = 0) const;
+    uint16_t read_uint16_be(const size_t offset = 0U) const;
 
     /**
      *  Read a signal-precision float-point value with big-endian.
@@ -341,7 +341,7 @@ public:
      *  @param offset
      *      The offset (default 0).
      */
-    void write_uint8(const uint8_t value, const size_t offset = 0);
+    void write_uint8(const uint8_t value, const size_t offset = 0U);
 
     /**
      *  Write unsigned 16-bit integer with big-endian at the specified offset.
@@ -353,7 +353,7 @@ public:
      *  @param offset
      *      The offset (default 0).
      */
-    void write_uint16_be(const uint16_t value, const size_t offset = 0);
+    void write_uint16_be(const uint16_t value, const size_t offset = 0U);
 
     /**
      *  Write signal-precision float-point with big-endian at the 

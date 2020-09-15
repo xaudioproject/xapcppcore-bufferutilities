@@ -97,7 +97,7 @@ bool BufferFetcher::is_end() const noexcept {
  *  Reset the fetcher. Move the cursor to the begin position.
  */
 void BufferFetcher::reset() noexcept {
-    this->m_cursor = 0;
+    this->m_cursor = 0U;
 }
 
 /**
@@ -147,7 +147,7 @@ size_t BufferFetcher::fetch_to(
     Buffer &destination, 
     const size_t destination_offset
 ) {
-    if (destination.get_length() == 0) {
+    if (destination.get_length() == 0U) {
         return 0U;
     }
 
@@ -178,7 +178,7 @@ size_t BufferFetcher::fetch_to(
  */
 Buffer BufferFetcher::fetch_all() {
     if (this->is_end()) {
-        return Buffer(0);
+        return Buffer(0U);
     }
     
     Buffer out = this->m_buffer->slice(this->m_cursor);
@@ -204,7 +204,7 @@ Buffer BufferFetcher::fetch_all() {
  */
 Buffer BufferFetcher::fetch_bytes(const size_t count) {
     if (count == 0U) {
-        return Buffer(0);
+        return Buffer(0U);
     }
 
     const size_t remaining = this->get_remaining_size();

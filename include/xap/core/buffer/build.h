@@ -11,10 +11,18 @@
 //  Endian flag.
 //
 
-#if __LITTLE_ENDIAN__
-#define XAP_CORE_BUFFER_LITTLE_ENDIAN
-#elif __BIG_ENDIAN__
-#define XAP_CORE_BUFFER_BIG_ENDIAN
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+# define XAP_CORE_BUFFER_LITTLE_ENDIAN
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+# define XAP_CORE_BUFFER_BIG_ENDIAN
+#elif __BYTE_ORDER__ == __ORDER_PDP_ENDIAN__
+//
+//  Bytes in 16-bit words are laid out in a 
+//  little-endian fashion, whereas the 16-bit 
+//  subwords of a 32-bit quantity are laid out 
+//  in big-endian fashion.
+//
+# define XAP_CORE_BUFFER_POP_ENDIAN
 #else
 # error "Cannot check compiler endian order."
 #endif

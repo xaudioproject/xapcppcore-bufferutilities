@@ -532,10 +532,14 @@ uint64_t Buffer::read_uint64_le(const size_t offset) const {
  *      The signal-precision float-point value.
  */
 float Buffer::read_float_be(const size_t offset) const {
-#ifdef XAP_CORE_BUFFER_BIG_ENDIAN
-    return this->read_float_forwards(offset);
+#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
+    this->read_float_backgrounds(offset);
+#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
+    this->read_float_forwards(offset);
+#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
+    this->read_float_forwards(offset);
 #else
-    return this->read_float_backgrounds(offset);
+# error "Invalid compiler endian order."
 #endif
 }
 
@@ -550,10 +554,14 @@ float Buffer::read_float_be(const size_t offset) const {
  *      The signal-precision float-point value.
  */
 float Buffer::read_float_le(const size_t offset) const {
-#ifdef XAP_CORE_BUFFER_BIG_ENDIAN
-    return this->read_float_backgrounds(offset);
+#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
+    this->read_float_forwards(offset);
+#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
+    this->read_float_backgrounds(offset);
+#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
+    this->read_float_backgrounds(offset);
 #else
-    return this->read_float_forwards(offset);
+# error "Invalid compiler endian order."
 #endif
 }
 
@@ -568,10 +576,14 @@ float Buffer::read_float_le(const size_t offset) const {
  *      The double-precision float-point value.
  */
 double Buffer::read_double_be(const size_t offset) const {
-#ifdef XAP_CORE_BUFFER_BIG_ENDIAN
-    return this->read_double_forwards(offset);
+#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
+    this->read_double_backwards(offset);
+#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
+    this->read_double_forwards(offset);
+#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
+    this->read_double_forwards(offset);
 #else
-    return this->read_double_backwards(offset);
+# error "Invalid compiler endian order."
 #endif
 }
 
@@ -586,10 +598,14 @@ double Buffer::read_double_be(const size_t offset) const {
  *      The double-precision float-point value.
  */
 double Buffer::read_double_le(const size_t offset) const {
-#ifdef XAP_CORE_BUFFER_BIG_ENDIAN
-    return this->read_double_backwards(offset);
+#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
+    this->read_double_forwards(offset);
+#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
+    this->read_double_backwards(offset);
+#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
+    this->read_double_backwards(offset);
 #else
-    return this->read_double_forwards(offset);
+# error "Invalid compiler endian order."
 #endif
 }
 
@@ -800,10 +816,14 @@ void Buffer::write_uint64_le(const uint64_t value, const size_t offset) {
  *      The offset (default 0).
  */
 void Buffer::write_float_be(const float value, const size_t offset) {
-#ifdef XAP_CORE_BUFFER_BIG_ENDIAN
+#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
+    this->write_float_backgrounds(value, offset);
+#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
+    this->write_float_forwards(value, offset);
+#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
     this->write_float_forwards(value, offset);
 #else
-    this->write_float_backgrounds(value, offset);
+# error "Invalid compiler endian order."
 #endif
 }
 
@@ -819,10 +839,14 @@ void Buffer::write_float_be(const float value, const size_t offset) {
  *      The offset (default 0).
  */
 void Buffer::write_float_le(const float value, const size_t offset) {
-#ifdef XAP_CORE_BUFFER_BIG_ENDIAN
+#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
+    this->write_float_forwards(value, offset);
+#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
+    this->write_float_backgrounds(value, offset);
+#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
     this->write_float_backgrounds(value, offset);
 #else
-    this->write_float_forwards(value, offset);
+# error "Invalid compiler endian order."
 #endif
 }
 
@@ -838,10 +862,14 @@ void Buffer::write_float_le(const float value, const size_t offset) {
  *      The offset (default 0).
  */
 void Buffer::write_double_be(const double value, const size_t offset) {
-#ifdef XAP_CORE_BUFFER_BIG_ENDIAN
+#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
+    this->write_double_backgrounds(value, offset);
+#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
+    this->write_double_forwards(value, offset);
+#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
     this->write_double_forwards(value, offset);
 #else
-    this->write_double_backgrounds(value, offset);
+# error "Invalid compiler endian order."
 #endif
 }
 
@@ -857,10 +885,14 @@ void Buffer::write_double_be(const double value, const size_t offset) {
  *      The offset (default 0).
  */
 void Buffer::write_double_le(const double value, const size_t offset) {
-#ifdef XAP_CORE_BUFFER_BIG_ENDIAN
+#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
+    this->write_double_forwards(value, offset);
+#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
+    this->write_double_backgrounds(value, offset);
+#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
     this->write_double_backgrounds(value, offset);
 #else
-    this->write_double_forwards(value, offset);
+# error "Invalid compiler endian order."
 #endif
 }
 

@@ -533,11 +533,11 @@ uint64_t Buffer::read_uint64_le(const size_t offset) const {
  */
 float Buffer::read_float_be(const size_t offset) const {
 #if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    this->read_float_backgrounds(offset);
+    return this->read_float_backgrounds(offset);
 #elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    this->read_float_forwards(offset);
+    return this->read_float_forwards(offset);
 #elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    this->read_float_forwards(offset);
+    return this->read_float_forwards(offset);
 #else
 # error "Invalid compiler endian order."
 #endif
@@ -555,11 +555,11 @@ float Buffer::read_float_be(const size_t offset) const {
  */
 float Buffer::read_float_le(const size_t offset) const {
 #if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    this->read_float_forwards(offset);
+    return this->read_float_forwards(offset);
 #elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    this->read_float_backgrounds(offset);
+    return this->read_float_backgrounds(offset);
 #elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    this->read_float_backgrounds(offset);
+    return this->read_float_backgrounds(offset);
 #else
 # error "Invalid compiler endian order."
 #endif
@@ -577,11 +577,11 @@ float Buffer::read_float_le(const size_t offset) const {
  */
 double Buffer::read_double_be(const size_t offset) const {
 #if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    this->read_double_backwards(offset);
+    return this->read_double_backwards(offset);
 #elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    this->read_double_forwards(offset);
+    return this->read_double_forwards(offset);
 #elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    this->read_double_forwards(offset);
+    return this->read_double_forwards(offset);
 #else
 # error "Invalid compiler endian order."
 #endif
@@ -599,11 +599,11 @@ double Buffer::read_double_be(const size_t offset) const {
  */
 double Buffer::read_double_le(const size_t offset) const {
 #if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    this->read_double_forwards(offset);
+    return this->read_double_forwards(offset);
 #elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    this->read_double_backwards(offset);
+    return this->read_double_backwards(offset);
 #elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    this->read_double_backwards(offset);
+    return this->read_double_backwards(offset);
 #else
 # error "Invalid compiler endian order."
 #endif

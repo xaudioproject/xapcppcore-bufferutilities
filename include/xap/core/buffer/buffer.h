@@ -279,10 +279,72 @@ public:
      *  @param offset
      *      The offset.
      *  @return
-     *      The unsigned 16-bit integer with big-endian.
+     *      The unsigned 16-bit integer.
      */
     uint16_t read_uint16_be(const size_t offset = 0U) const;
 
+    /**
+     *  Read an unsigned 16-bit integer with little-endian.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The unsigned 16-bit integer.
+     */
+    uint16_t read_uint16_le(const size_t offset = 0U) const;
+
+    /**
+     *  Read an unsigned 32-bit integer with big-endian.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The unsigned 32-bit integer.
+     */
+    uint32_t read_uint32_be(const size_t offset = 0U) const;
+
+    /**
+     *  Read an unsigned 32-bit integer with little-endian.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The unsigned 32-bit integer.
+     */
+    uint32_t read_uint32_le(const size_t offset = 0U) const;
+
+#if defined(UINT64_MAX)
+
+    /**
+     *  Read an unsigned 64-bit integer with big-endian.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The unsigned 64-bit integer.
+     */
+    uint64_t read_uint64_be(const size_t offset = 0U) const;
+
+    /**
+     *  Read an unsigned 64-bit integer with little-endian.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The unsigned 64-bit integer.
+     */
+    uint64_t read_uint64_le(const size_t offset = 0U) const;
+#endif  //  #if defined(UINT64_MAX)
     /**
      *  Read a signal-precision float-point value with big-endian.
      * 
@@ -354,6 +416,75 @@ public:
      *      The offset (default 0).
      */
     void write_uint16_be(const uint16_t value, const size_t offset = 0U);
+
+    /**
+     *  Write unsigned 16-bit integer with little-endian at the specified 
+     *  offset.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The unsigned 16-bit integer.
+     *  @param offset
+     *      The offset (default 0).
+     */
+    void write_uint16_le(const uint16_t value, const size_t offset = 0U);
+
+    /**
+     *  Write unsigned 32-bit integer with big-endian at the specified 
+     *  offset.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The unsigned 32-bit integer.
+     *  @param offset
+     *      The offset (default 0).
+     */
+    void write_uint32_be(const uint32_t value, const size_t offset = 0U);
+
+    /**
+     *  Write unsigned 32-bit integer with little-endian at the specified 
+     *  offset.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The unsigned 32-bit integer.
+     *  @param offset
+     *      The offset (default 0).
+     */
+    void write_uint32_le(const uint32_t value, const size_t offset = 0U);
+
+#if defined(UINT64_MAX)
+
+    /**
+     *  Write unsigned 64-bit integer with big-endian at the specified 
+     *  offset.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The unsigned 64-bit integer.
+     *  @param offset
+     *      The offset (default 0).
+     */
+    void write_uint64_be(const uint64_t value, const size_t offset = 0U);
+
+    /**
+     *  Write unsigned 64-bit integer with little-endian at the specified 
+     *  offset.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The unsigned 64-bit integer.
+     *  @param offset
+     *      The offset (default 0).
+     */
+    void write_uint64_le(const uint64_t value, const size_t offset = 0U);
+
+#endif  //  #if defined(UINT64_MAX)
 
     /**
      *  Write signal-precision float-point with big-endian at the 
@@ -454,7 +585,7 @@ private:
      *  @param length
      *      The length of buffer.
      */
-    Buffer(std::shared_ptr<uint8_t> buffer, const size_t length) noexcept;
+    Buffer(std::shared_ptr<uint8_t> buffer, const size_t length);
     
     /**
      *  Construct the object.
@@ -470,7 +601,7 @@ private:
         std::shared_ptr<uint8_t>    buffer,
         const size_t                offset,
         const size_t                length
-    ) noexcept;
+    );
 
     //
     //  Private methods.

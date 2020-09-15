@@ -171,6 +171,13 @@ void xap_assert_buffer_equal_double_le(
     );
 }
 
+void print_hex(const xap::core::buffer::Buffer &data) {
+    for (size_t i = 0; i < data.get_length(); ++i) {
+        printf("%02X", data[i]);
+    }
+    printf("\n");
+}
+
 //
 //  Entry.
 //
@@ -473,6 +480,89 @@ int main() {
         xap::core::buffer::Buffer buf11(dat11, sizeof(dat11));
         float f11 = buf11.read_double_le(0U);
         xap::test::assert_ok(std::isnan(f11), "Case 10: f11 is not NaN.");
+    }
+
+    //
+    //  Case 11: unsigned 16-bit integer.
+    //
+    {
+        const uint8_t expected[] = {0x00, 0x01, 0x02, 0x02, 0x01};
+        xap::core::buffer::Buffer buf(5U, false);
+        xap::core::buffer::Buffer excepted_buf(expected, sizeof(expected));
+        buf.write_uint16_be(0x0102, 1U);
+        buf.write_uint16_le(0x0102, 3U);
+        xap::test::assert_equal<xap::core::buffer::Buffer>(
+            buf,
+            excepted_buf,
+            "Case 11: buf != expected_buf"
+        );
+        
+        xap::test::assert_equal<uint16_t>(
+            excepted_buf.read_uint16_be(1U),
+            0x0102,
+            "Case 11: excepted_buf.read_uint16_be(1U) != 0x0102"
+        );
+        xap::test::assert_equal<uint16_t>(
+            excepted_buf.read_uint16_le(3U),
+            0x0102,
+            "Case 11: expected_buf.read_uint16_le(3U) != 0x0102"
+        );
+    }
+
+    //
+    //  Case 12: unsigned 32-bit integer.
+    //
+    {
+        const uint8_t expected[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x04, 0x03, 
+                                    0x02, 0x01};
+        xap::core::buffer::Buffer buf(9U, false);
+        xap::core::buffer::Buffer excepted_buf(expected, sizeof(expected));
+        buf.write_uint32_be(0x01020304, 1U);
+        buf.write_uint32_le(0x01020304, 5U);
+        xap::test::assert_equal<xap::core::buffer::Buffer>(
+            buf,
+            excepted_buf,
+            "Case 12: buf != expected_buf"
+        );
+        
+        xap::test::assert_equal<uint32_t>(
+            excepted_buf.read_uint32_be(1U),
+            0x01020304,
+            "Case 12: excepted_buf.read_uint32_be(1U) != 0x01020304"
+        );
+        xap::test::assert_equal<uint32_t>(
+            excepted_buf.read_uint32_le(5U),
+            0x01020304,
+            "Case 12: excepted_buf.read_uint32_le(5U) != 0x01020304"
+        );
+    }
+
+    //
+    //  Case 13: unsigned 64-bit integer.
+    //
+    {
+        const uint8_t expected[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 
+                                    0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D,
+                                    0x0E, 0x0F, 0x10};
+        xap::core::buffer::Buffer buf(sizeof(expected), false);
+        xap::core::buffer::Buffer excepted_buf(expected, sizeof(expected));
+        buf.write_uint64_be(0x0102030405060708, 1U);
+        buf.write_uint64_le(0x100F0E0D0C0B0A09, 9U);
+        xap::test::assert_equal<xap::core::buffer::Buffer>(
+            buf,
+            excepted_buf,
+            "Case 13: buf != expected_buf"
+        );
+        xap::test::assert_equal<uint64_t>(
+            excepted_buf.read_uint64_be(1U),
+            0x0102030405060708,
+            "Case 13: excepted_buf.read_uint64_be(1U) != 0x0102030405060708"
+        );
+        xap::test::assert_equal<uint64_t>(
+            excepted_buf.read_uint64_le(9U),
+            0x100F0E0D0C0B0A09,
+            "Case 13: excepted_buf.read_uint64_le(9U) != 0x100F0E0D0C0B0A09"
+        );
     }
 
     return 0;

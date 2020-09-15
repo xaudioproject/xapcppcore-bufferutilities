@@ -400,15 +400,126 @@ uint8_t Buffer::read_uint8(const size_t offset) const {
  *  @param offset
  *      The offset.
  *  @return
- *      The unsigned 16-bit integer with big-endian.
+ *      The unsigned 16-bit integer.
  */
 uint16_t Buffer::read_uint16_be(const size_t offset) const {
     this->check_access(offset, 2U);
-    return (uint16_t)(
-        ((uint16_t)(this->m_bufferstart[offset]) << 8U) |
-        ((uint16_t)(this->m_bufferstart[offset + 1U]))
+    return static_cast<uint16_t>(
+        (static_cast<uint16_t>(this->m_bufferstart[offset + 0U]) << 8U) |
+        (static_cast<uint16_t>(this->m_bufferstart[offset + 1U]))
     );
 }
+
+/**
+ *  Read an unsigned 16-bit integer with little-endian.
+ * 
+ * 
+ *  @throw BufferException
+ *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param offset
+ *      The offset.
+ *  @return
+ *      The unsigned 16-bit integer.
+ */
+uint16_t Buffer::read_uint16_le(const size_t offset) const {
+    this->check_access(offset, 2U);
+    return static_cast<uint16_t>(
+        (static_cast<uint16_t>(this->m_bufferstart[offset + 1U]) << 8U) |
+        (static_cast<uint16_t>(this->m_bufferstart[offset + 0U]))
+    );
+}
+
+/**
+ *  Read an unsigned 32-bit integer with big-endian.
+ * 
+ *  @throw BufferException
+ *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param offset
+ *      The offset.
+ *  @return
+ *      The unsigned 32-bit integer.
+ */
+uint32_t Buffer::read_uint32_be(const size_t offset) const {
+    this->check_access(offset, 4U);
+    return static_cast<uint32_t>(
+        (static_cast<uint32_t>(this->m_bufferstart[offset + 0U]) << 24U) |
+        (static_cast<uint32_t>(this->m_bufferstart[offset + 1U]) << 16U) |
+        (static_cast<uint32_t>(this->m_bufferstart[offset + 2U]) <<  8U) |
+        (static_cast<uint32_t>(this->m_bufferstart[offset + 3U]))
+    );
+}
+
+/**
+ *  Read an unsigned 32-bit integer with little-endian.
+ * 
+ *  @throw BufferException
+ *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param offset
+ *      The offset.
+ *  @return
+ *      The unsigned 32-bit integer.
+ */
+uint32_t Buffer::read_uint32_le(const size_t offset) const {
+    this->check_access(offset, 4U);
+    return static_cast<uint32_t>(
+        (static_cast<uint32_t>(this->m_bufferstart[offset + 3U]) << 24U) |
+        (static_cast<uint32_t>(this->m_bufferstart[offset + 2U]) << 16U) |
+        (static_cast<uint32_t>(this->m_bufferstart[offset + 1U]) <<  8U) |
+        (static_cast<uint32_t>(this->m_bufferstart[offset + 0U]))
+    );
+}
+
+#if defined(UINT64_MAX)
+
+/**
+ *  Read an unsigned 64-bit integer with big-endian.
+ * 
+ *  @throw BufferException
+ *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param offset
+ *      The offset.
+ *  @return
+ *      The unsigned 64-bit integer.
+ */
+uint64_t Buffer::read_uint64_be(const size_t offset) const {
+    this->check_access(offset, 8U);
+    return static_cast<uint64_t>(
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 0U]) << 56U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 1U]) << 48U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 2U]) << 40U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 3U]) << 32U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 4U]) << 24U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 5U]) << 16U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 6U]) <<  8U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 7U]))
+    );
+}
+
+/**
+ *  Read an unsigned 64-bit integer with little-endian.
+ * 
+ *  @throw BufferException
+ *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param offset
+ *      The offset.
+ *  @return
+ *      The unsigned 64-bit integer.
+ */
+uint64_t Buffer::read_uint64_le(const size_t offset) const {
+    this->check_access(offset, 8U);
+    return static_cast<uint64_t>(
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 7U]) << 56U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 6U]) << 48U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 5U]) << 40U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 4U]) << 32U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 3U]) << 24U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 2U]) << 16U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 1U]) <<  8U) |
+        (static_cast<uint64_t>(this->m_bufferstart[offset + 0U]))
+    );
+}
+
+#endif  //  #if defined(UINT64_MAX)
 
 /**
  *  Read a signal-precision float-point value with big-endian.
@@ -509,9 +620,173 @@ void Buffer::write_uint8(const uint8_t value, const size_t offset) {
  */
 void Buffer::write_uint16_be(const uint16_t value, const size_t offset) {
     this->check_access(offset, 2U);
-    this->m_bufferstart[offset] = (uint8_t)((value & 0xFF00) >> (uint16_t)8U);
-    this->m_bufferstart[offset + 1] = (uint8_t)(value & (uint16_t)0x00FF);
+    this->m_bufferstart[offset + 0U] = 
+        static_cast<uint8_t>((value & 0xFF00) >> 8U);
+    this->m_bufferstart[offset + 1U] = 
+        static_cast<uint8_t>(value & 0x00FF);
 }
+
+/**
+ *  Write unsigned 16-bit integer with little-endian at the specified 
+ *  offset.
+ * 
+ *  @throw BufferException
+ *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param value
+ *      The unsigned 16-bit integer.
+ *  @param offset
+ *      The offset (default 0).
+ */
+void Buffer::write_uint16_le(const uint16_t value, const size_t offset) {
+    this->check_access(offset, 2U);
+    this->m_bufferstart[offset + 1U] = 
+        static_cast<uint8_t>((value & static_cast<uint16_t>(0xFF00)) >> 8U);
+    this->m_bufferstart[offset + 0U] = 
+        static_cast<uint8_t>(value & static_cast<uint16_t>(0x00FF));
+}
+
+/**
+ *  Write unsigned 32-bit integer with big-endian at the specified 
+ *  offset.
+ * 
+ *  @throw BufferException
+ *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param value
+ *      The unsigned 32-bit integer.
+ *  @param offset
+ *      The offset (default 0).
+ */
+void Buffer::write_uint32_be(const uint32_t value, const size_t offset) {
+    this->check_access(offset, 4U);
+    this->m_bufferstart[offset + 0U] = 
+        static_cast<uint8_t>((value & static_cast<uint32_t>(0xFF000000)) >>24U);
+    this->m_bufferstart[offset + 1U] = 
+        static_cast<uint8_t>((value & static_cast<uint32_t>(0x00FF0000)) >>16U);
+    this->m_bufferstart[offset + 2U] = 
+        static_cast<uint8_t>((value & static_cast<uint32_t>(0x0000FF00)) >> 8U);
+    this->m_bufferstart[offset + 3U] = 
+        static_cast<uint8_t>(value & static_cast<uint32_t>(0x000000FF));
+}
+
+/**
+ *  Write unsigned 32-bit integer with little-endian at the specified 
+ *  offset.
+ * 
+ *  @throw BufferException
+ *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param value
+ *      The unsigned 32-bit integer.
+ *  @param offset
+ *      The offset (default 0).
+ */
+void Buffer::write_uint32_le(const uint32_t value, const size_t offset) {
+    this->check_access(offset, 4U);
+    this->m_bufferstart[offset + 3U] = 
+        static_cast<uint8_t>((value & static_cast<uint32_t>(0xFF000000)) >>24U);
+    this->m_bufferstart[offset + 2U] = 
+        static_cast<uint8_t>((value & static_cast<uint32_t>(0x00FF0000)) >>16U);
+    this->m_bufferstart[offset + 1U] = 
+        static_cast<uint8_t>((value & static_cast<uint32_t>(0x0000FF00)) >> 8U);
+    this->m_bufferstart[offset + 0U] = 
+        static_cast<uint8_t>(value & static_cast<uint32_t>(0x000000FF));
+}
+
+#if defined(UINT64_MAX)
+
+/**
+ *  Write unsigned 64-bit integer with big-endian at the specified 
+ *  offset.
+ * 
+ *  @throw BufferException
+ *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param value
+ *      The unsigned 64-bit integer.
+ *  @param offset
+ *      The offset (default 0).
+ */
+void Buffer::write_uint64_be(const uint64_t value, const size_t offset) {
+    this->check_access(offset, 8U);
+    this->m_bufferstart[offset + 0U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0xFF00000000000000)) >> 56U
+        );
+    this->m_bufferstart[offset + 1U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x00FF000000000000)) >> 48U
+        );
+    this->m_bufferstart[offset + 2U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x0000FF0000000000)
+        ) >> 40U);
+    this->m_bufferstart[offset + 3U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x000000FF00000000)) >> 32U
+        );
+    this->m_bufferstart[offset + 4U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x00000000FF000000)) >> 24U
+        );
+    this->m_bufferstart[offset + 5U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x0000000000FF0000)) >> 16U
+        );
+    this->m_bufferstart[offset + 6U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x000000000000FF00)) >>  8U
+        );
+    this->m_bufferstart[offset + 7U] = 
+        static_cast<uint8_t>(
+            value & static_cast<uint64_t>(0x00000000000000FF)
+        );
+}
+
+/**
+ *  Write unsigned 64-bit integer with little-endian at the specified 
+ *  offset.
+ * 
+ *  @throw BufferException
+ *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param value
+ *      The unsigned 64-bit integer.
+ *  @param offset
+ *      The offset (default 0).
+ */
+void Buffer::write_uint64_le(const uint64_t value, const size_t offset) {
+    this->check_access(offset, 8U);
+    this->m_bufferstart[offset + 7U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0xFF00000000000000)) >> 56U
+        );
+    this->m_bufferstart[offset + 6U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x00FF000000000000)) >> 48U
+        );
+    this->m_bufferstart[offset + 5U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x0000FF0000000000)
+        ) >> 40U);
+    this->m_bufferstart[offset + 4U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x000000FF00000000)) >> 32U
+        );
+    this->m_bufferstart[offset + 3U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x00000000FF000000)) >> 24U
+        );
+    this->m_bufferstart[offset + 2U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x0000000000FF0000)) >> 16U
+        );
+    this->m_bufferstart[offset + 1U] = 
+        static_cast<uint8_t>(
+            (value & static_cast<uint64_t>(0x000000000000FF00)) >>  8U
+        );
+    this->m_bufferstart[offset + 0U] = 
+        static_cast<uint8_t>(
+            value & static_cast<uint64_t>(0x00000000000000FF)
+        );
+}
+#endif  //  #if defined(UINT64_MAX)
 
 /**
  *  Write signal-precision float-point with big-endian at the 
@@ -659,7 +934,7 @@ Buffer Buffer::concat(const Buffer buffers[], const size_t count) {
  *  @param length
  *      The length of buffer.
  */
-Buffer::Buffer(std::shared_ptr<uint8_t> buffer, const size_t length) noexcept {
+Buffer::Buffer(std::shared_ptr<uint8_t> buffer, const size_t length) {
     this->prepare(buffer, 0, length);
 }
 
@@ -677,7 +952,7 @@ Buffer::Buffer(
     std::shared_ptr<uint8_t> buffer,
     const size_t offset,
     const size_t length
-) noexcept {
+) {
     this->prepare(buffer, offset, length);
 }
 

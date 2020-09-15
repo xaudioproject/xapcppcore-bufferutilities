@@ -48,7 +48,7 @@ void xap_assert_buffer_equal_float_be(
         message
     );
 
-    xap::core::buffer::Buffer buffer2(datalen, true);
+    xap::core::buffer::Buffer buffer2(datalen, false);
     buffer2.write_float_be(value, offset);
     xap::test::assert_equal<xap::core::buffer::Buffer>(
         buffer1,
@@ -86,7 +86,7 @@ void xap_assert_buffer_equal_float_le(
         message
     );
 
-    xap::core::buffer::Buffer buffer2(datalen, true);
+    xap::core::buffer::Buffer buffer2(datalen, false);
     buffer2.write_float_le(value, offset);
     xap::test::assert_equal<xap::core::buffer::Buffer>(
         buffer1,
@@ -124,7 +124,7 @@ void xap_assert_buffer_equal_double_be(
         message
     );
 
-    xap::core::buffer::Buffer buffer2(datalen, true);
+    xap::core::buffer::Buffer buffer2(datalen, false);
     buffer2.write_double_be(value, offset);
     xap::test::assert_equal<xap::core::buffer::Buffer>(
         buffer1,
@@ -162,7 +162,7 @@ void xap_assert_buffer_equal_double_le(
         message
     );
 
-    xap::core::buffer::Buffer buffer2(datalen, true);
+    xap::core::buffer::Buffer buffer2(datalen, false);
     buffer2.write_double_le(value, offset);
     xap::test::assert_equal<xap::core::buffer::Buffer>(
         buffer1,

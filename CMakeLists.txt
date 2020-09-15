@@ -22,5 +22,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 #  Logger verbose
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
+add_subdirectory(src)
+
 ENABLE_TESTING()
 add_subdirectory(test)

@@ -11,7 +11,165 @@
 
 #include "xap/core/buffer/buffer.h"
 
+#include <cmath>
+#include <limits>
 #include <stdio.h>
+
+//
+//  Functions.
+//
+
+/**
+ *  Assert buffer read signal-precision float-point value with big-endian
+ *  is equal to given float-point value.
+ * 
+ *  @param data
+ *      The raw buffer data (which bytes other than float-point must be 0).
+ *  @param datalen
+ *      The length of raw buffer data.
+ *  @param offset
+ *      The offset.
+ *  @param value
+ *      The float-point value.
+ *  @param message
+ *      The message which would be shown if not equal.
+ */
+void xap_assert_buffer_equal_float_be(
+    const uint8_t *data,
+    const size_t datalen,
+    const size_t offset,
+    const float value,
+    const char *message = nullptr
+) {
+    xap::core::buffer::Buffer buffer1(data, datalen);
+    xap::test::assert_equal<float>(
+        buffer1.read_float_be(offset),
+        value,
+        message
+    );
+
+    xap::core::buffer::Buffer buffer2(datalen, true);
+    buffer2.write_float_be(value, offset);
+    xap::test::assert_equal<xap::core::buffer::Buffer>(
+        buffer1,
+        buffer2,
+        message
+    );
+}
+
+/**
+ *  Assert buffer read signal-precision float-point value with little-endian
+ *  is equal to given float-point value.
+ * 
+ *  @param data
+ *      The raw buffer data.
+ *  @param datalen
+ *      The length of raw buffer data.
+ *  @param offset
+ *      The offset.
+ *  @param value
+ *      The float-point value.
+ *  @param message
+ *      The message which would be shown if not equal.
+ */
+void xap_assert_buffer_equal_float_le(
+    const uint8_t *data,
+    const size_t datalen,
+    const size_t offset,
+    const float value,
+    const char *message = nullptr
+) {
+    xap::core::buffer::Buffer buffer1(data, datalen);
+    xap::test::assert_equal<float>(
+        buffer1.read_float_le(offset),
+        value,
+        message
+    );
+
+    xap::core::buffer::Buffer buffer2(datalen, true);
+    buffer2.write_float_le(value, offset);
+    xap::test::assert_equal<xap::core::buffer::Buffer>(
+        buffer1,
+        buffer2,
+        message
+    );
+}
+
+/**
+ *  Assert buffer read double-precision float-point value with big-endian
+ *  is equal to given float-point value.
+ * 
+ *  @param data
+ *      The raw buffer data (which bytes other than float-point must be 0).
+ *  @param datalen
+ *      The length of raw buffer data.
+ *  @param offset
+ *      The offset.
+ *  @param value
+ *      The float-point value.
+ *  @param message
+ *      The message which would be shown if not equal.
+ */
+void xap_assert_buffer_equal_double_be(
+    const uint8_t *data,
+    const size_t datalen,
+    const size_t offset,
+    const double value,
+    const char *message = nullptr
+) {
+    xap::core::buffer::Buffer buffer1(data, datalen);
+    xap::test::assert_equal<float>(
+        buffer1.read_double_be(offset),
+        value,
+        message
+    );
+
+    xap::core::buffer::Buffer buffer2(datalen, true);
+    buffer2.write_double_be(value, offset);
+    xap::test::assert_equal<xap::core::buffer::Buffer>(
+        buffer1,
+        buffer2,
+        message
+    );
+}
+
+/**
+ *  Assert buffer read double-precision float-point value with little-endian
+ *  is equal to given float-point value.
+ * 
+ *  @param data
+ *      The raw buffer data.
+ *  @param datalen
+ *      The length of raw buffer data.
+ *  @param offset
+ *      The offset.
+ *  @param value
+ *      The float-point value.
+ *  @param message
+ *      The message which would be shown if not equal.
+ */
+void xap_assert_buffer_equal_double_le(
+    const uint8_t *data,
+    const size_t datalen,
+    const size_t offset,
+    const double value,
+    const char *message = nullptr
+) {
+    xap::core::buffer::Buffer buffer1(data, datalen);
+    xap::test::assert_equal<float>(
+        buffer1.read_double_le(offset),
+        value,
+        message
+    );
+
+    xap::core::buffer::Buffer buffer2(datalen, true);
+    buffer2.write_double_le(value, offset);
+    xap::test::assert_equal<xap::core::buffer::Buffer>(
+        buffer1,
+        buffer2,
+        message
+    );
+}
 
 //
 //  Entry.
@@ -119,6 +277,203 @@ int main() {
         buf12 == buf13,
         "buf12 != buf13"
     );
+
+    //
+    //  Case 9: Signal-precision float-point.
+    //
+    {
+        const uint8_t dat1[] = {0x3f, 0x80, 0x00, 0x00};
+        xap_assert_buffer_equal_float_be(
+            dat1,
+            sizeof(dat1),
+            0U,
+            1.0,
+            "Case 9: dat1 test failed."
+        );
+
+        const uint8_t dat2[] = {0x00, 0x00, 0x00, 0x80, 0x3F};
+        xap_assert_buffer_equal_float_le(
+            dat2,
+            sizeof(dat2),
+            1U,
+            1.0,
+            "Case 9: dat2 test failed."
+        );
+
+        const uint8_t dat3[] = {0xC0, 0x00, 0x00, 0x00};
+        xap_assert_buffer_equal_float_be(
+            dat3,
+            sizeof(dat3),
+            0U,
+            -2.0,
+            "Case 9: dat3 test failed."
+        );
+        const uint8_t dat4[] = {0x00, 0x00, 0x00, 0xC0};
+        xap_assert_buffer_equal_float_le(
+            dat4,
+            sizeof(dat4),
+            0U,
+            -2.0,
+            "Case 9: dat4 test failed."
+        );
+
+        const uint8_t dat5[] = {0x00, 0x00, 0x00, 0x00};
+        xap_assert_buffer_equal_float_be(
+            dat5,
+            sizeof(dat5),
+            0U,
+            0.0,
+            "Case 9: dat5 test failed."
+        );
+        const uint8_t dat6[] = {0x00, 0x00, 0x00, 0x80};
+        xap_assert_buffer_equal_float_le(
+            dat6,
+            sizeof(dat6),
+            0U,
+            -0.0,
+            "Case 9: dat6 test failed."
+        );
+
+        const uint8_t dat7[] = {0xFF, 0xC0, 0x00, 0x01};
+        xap::core::buffer::Buffer buf7(dat7, sizeof(dat7));
+        float f7 = buf7.read_float_be(0U);
+        xap::test::assert_ok(std::isnan(f7), "Case 9: f7 is not NaN.");
+        xap::core::buffer::Buffer buf7_w(sizeof(dat7));
+        buf7_w.write_float_be(f7);
+        xap::test::assert_equal<xap::core::buffer::Buffer>(
+            buf7,
+            buf7_w,
+            "Case 9: buf7 != buf7_w"
+        );
+
+        const uint8_t dat8[] = {0x01, 0x00, 0x80, 0xFF};
+        xap::core::buffer::Buffer buf8(dat8, sizeof(dat8));
+        float f8 = buf8.read_float_le(0U);
+        xap::test::assert_ok(std::isnan(f8), "Case 9: f8 is not NaN.");
+        xap::core::buffer::Buffer buf8_w(sizeof(dat8));
+        buf8_w.write_float_le(f8);
+        xap::test::assert_equal<xap::core::buffer::Buffer>(
+            buf8,
+            buf8_w,
+            "Case 9: buf8 != buf8_w"
+        );
+
+        const uint8_t dat9[] = {0x7F, 0x80, 0x00, 0x00};
+        xap_assert_buffer_equal_float_be(
+            dat9,
+            sizeof(dat9),
+            0U,
+            INFINITY,
+            "Case 9: dat9 test failed."
+        );
+
+        const uint8_t dat10[] = {0x00, 0x00, 0x80, 0xFF};
+        xap_assert_buffer_equal_float_le(
+            dat10,
+            sizeof(dat10),
+            0U,
+            -INFINITY,
+            "Case 9: dat10 test failed."
+        );
+    }
+
+    //
+    //  Case 10: Double-precision double-point.
+    //
+    {
+        const uint8_t dat1[] = {0x00, 0x00, 0x3F, 0xF0, 0x00, 0x00, 0x00, 0x00, 
+                                0x00, 0x00};
+        xap_assert_buffer_equal_double_be(
+            dat1,
+            sizeof(dat1),
+            2U,
+            1.0,
+            "Case 10: dat1 test failed."
+        );
+
+        const uint8_t dat2[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+                                0xF0, 0x3F};
+        xap_assert_buffer_equal_double_le(
+            dat2,
+            sizeof(dat2),
+            1U,
+            1.0,
+            "Case 10: dat2 test failed."
+        );
+
+        const uint8_t dat3[] = {0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        xap_assert_buffer_equal_double_be(
+            dat3,
+            sizeof(dat3),
+            0U,
+            -2.0,
+            "Case 10: dat3 test failed."
+        );
+
+        const uint8_t dat4[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0};
+        xap_assert_buffer_equal_double_le(
+            dat4,
+            sizeof(dat4),
+            0U,
+            -2.0,
+            "Case 10: dat4 test failed."
+        );
+
+        const uint8_t dat5[] = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        xap_assert_buffer_equal_double_be(
+            dat5,
+            sizeof(dat5),
+            0U,
+            -0.0,
+            "Case 10: dat5 test failed."
+        );
+
+        const uint8_t dat6[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        xap_assert_buffer_equal_double_le(
+            dat6,
+            sizeof(dat6),
+            0U,
+            0.0,
+            "Case 10: dat6 test failed."
+        );
+
+        const uint8_t dat7[] = {0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        xap_assert_buffer_equal_double_be(
+            dat7,
+            sizeof(dat7),
+            0U,
+            INFINITY,
+            "Case 10: dat7 test failed."
+        );
+        const uint8_t dat8[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF0, 0xFF};
+        xap_assert_buffer_equal_double_le(
+            dat8,
+            sizeof(dat8),
+            0U,
+            -INFINITY,
+            "Case 10: dat8 test failed."
+        );
+
+        //  sNaN
+        const uint8_t dat9[] = {0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
+        xap::core::buffer::Buffer buf9(dat9, sizeof(dat9));
+        float f9 = buf9.read_double_be(0U);
+        xap::test::assert_ok(std::isnan(f9), "Case 10: f9 is not NaN.");
+
+        //  qNaN
+        const uint8_t dat10[] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF8, 
+                                 0x7F};
+        xap::core::buffer::Buffer buf10(dat10, sizeof(dat10));
+        float f10 = buf10.read_double_le(0U);
+        xap::test::assert_ok(std::isnan(f10), "Case 10: f10 is not NaN.");
+
+        //  An alternative encoding of NaN
+        const uint8_t dat11[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
+                                 0x7F};
+        xap::core::buffer::Buffer buf11(dat11, sizeof(dat11));
+        float f11 = buf11.read_double_le(0U);
+        xap::test::assert_ok(std::isnan(f11), "Case 10: f11 is not NaN.");
+    }
 
     return 0;
 }

@@ -12,6 +12,7 @@
 //
 #include <memory>
 #include <stdint.h>
+#include <xap/core/buffer/build.h>
 #include <xap/core/buffer/error.h>
 
 namespace xap {
@@ -34,7 +35,7 @@ public:
      *  @param source
      *      The source buffer.
      */
-    Buffer(const Buffer &source) noexcept;
+    Buffer(const Buffer &source);
 
     /**
      *  Construct the object (, and initial all zero).
@@ -87,7 +88,7 @@ public:
      *  @return
      *      The target buffer.
      */
-    Buffer& operator=(const Buffer &source) noexcept;
+    Buffer& operator=(const Buffer &source);
 
     /**
      *  Operator '[]'. Get the buffer value of specified position.
@@ -283,6 +284,54 @@ public:
     uint16_t read_uint16_be(const size_t offset = 0) const;
 
     /**
+     *  Read a signal-precision float-point value with big-endian.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The signal-precision float-point value.
+     */
+    float read_float_be(const size_t offset = 0U) const;
+
+    /**
+     *  Read a signal-precision float-point value with little-endian.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The signal-precision float-point value.
+     */
+    float read_float_le(const size_t offset = 0U) const;
+
+    /**
+     *  Read a double-precision float-point value with big-endian.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The double-precision float-point value.
+     */
+    double read_double_be(const size_t offset = 0U) const;
+
+    /**
+     *  Read a double-precision float-point value with little-endian.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The double-precision float-point value.
+     */
+    double read_double_le(const size_t offset = 0U) const;
+
+    /**
      *  Write unsigned 8-bit integer at the specified offset.
      * 
      *  @throw BufferException
@@ -305,6 +354,58 @@ public:
      *      The offset (default 0).
      */
     void write_uint16_be(const uint16_t value, const size_t offset = 0);
+
+    /**
+     *  Write signal-precision float-point with big-endian at the 
+     *  specified offset.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The signal-precision float-point value.
+     *  @param offset
+     *      The offset (default 0).
+     */
+    void write_float_be(const float value, const size_t offset = 0U);
+
+    /**
+     *  Write signal-precision float-point with little-endian at the 
+     *  specified offset.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The signal-precision float-point value.
+     *  @param offset
+     *      The offset (default 0).
+     */
+    void write_float_le(const float value, const size_t offset = 0U);
+
+    /**
+     *  Write double-precision float-point with big-endian at the 
+     *  specified offset.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The double-precision float-point value.
+     *  @param offset
+     *      The offset (default 0).
+     */
+    void write_double_be(const double value, const size_t offset = 0U);
+
+    /**
+     *  Write double-precision float-point with little-endian at the 
+     *  specified offset.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The double-precision float-point value.
+     *  @param offset
+     *      The offset (default 0).
+     */
+    void write_double_le(const double value, const size_t offset = 0U);
     
     /**
      *  Check whether the binary data is equal to self.
@@ -405,7 +506,151 @@ private:
         std::shared_ptr<uint8_t>    buffer,
         const size_t                offset,
         const size_t                length
-    ) noexcept;
+    );
+
+    /**
+     *  Read signal-precision float-point in order as following:
+     *          
+     *                       +-------+---+---+---+-----+----+--------+
+     *      Source bites:    | LSb 0 | 1 | 2 | 3 | ... | 30 | MSb 31 |
+     *                       +-------+---+---+---+-----+----+--------+
+     *      Result bites:    | LSb 0 | 1 | 2 | 3 | ... | 30 | MSb 31 |
+     *                       +-------+---+---+---+-----+----+--------+
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The signal-precision float-point value.
+     */
+    float read_float_forwards(const size_t offset = 0U) const;
+
+    /**
+     *  Read signal-precision float-point in reverse order as following:
+     *          
+     *                       +--------+----+----+----+-----+----+--------+
+     *      Source bites:    | LSb 0  | 1  | 2  | 3  | ... | 30 | MSb 31 |
+     *                       +--------+----+----+----+-----+----+--------+
+     *      Result bites:    | MSb 31 | 30 | 29 | 28 | ... | 1  | LSb 0  |
+     *                       +--------+----+----+----+-----+----+--------+
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The signal-precision float-point value.
+     */
+    float read_float_backgrounds(const size_t offset = 0U) const;
+
+    /**
+     *  Read double-precision float-point in order as following:
+     * 
+     *                       +-------+---+---+---+-----+----+--------+
+     *      Source bites:    | LSb 0 | 1 | 2 | 3 | ... | 62 | MSb 63 |
+     *                       +-------+---+---+---+-----+----+--------+
+     *      Result bites:    | LSb 0 | 1 | 2 | 3 | ... | 62 | MSb 63 |
+     *                       +-------+---+---+---+-----+----+--------+
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The double-precision float-point value.
+     */
+    double read_double_forwards(const size_t offset = 0U) const;
+
+    /**
+     *  Read double-precision float-point in reverse order as following:
+     *          
+     *                       +--------+----+----+----+-----+----+--------+
+     *      Source bites:    | LSb 0  | 1  | 2  | 3  | ... | 62 | MSb 63 |
+     *                       +--------+----+----+----+-----+----+--------+
+     *      Result bites:    | MSb 63 | 62 | 61 | 60 | ... | 1  | LSb 0  |
+     *                       +--------+----+----+----+-----+----+--------+
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The double-precision float-point value.
+     */
+    double read_double_backwards(const size_t offset = 0U) const;
+
+    /**
+     *  Write signal-precision float-point in order as following:
+     *  
+     *                       +-------+---+---+---+-----+----+--------+
+     *      Source bites:    | LSb 0 | 1 | 2 | 3 | ... | 30 | MSb 31 |
+     *                       +-------+---+---+---+-----+----+--------+
+     *      Result bites:    | LSb 0 | 1 | 2 | 3 | ... | 30 | MSb 31 |
+     *                       +-------+---+---+---+-----+----+--------+
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The signal-precision float-point value.
+     *  @param offset
+     *      The offset.
+     */
+    void write_float_forwards(const float value, const size_t offset = 0U);
+
+    /**
+     *  Write signal-precision float-point in reverse order as following:
+     *          
+     *                       +--------+----+----+----+-----+----+--------+
+     *      Source bites:    | LSb 0  | 1  | 2  | 3  | ... | 30 | MSb 31 |
+     *                       +--------+----+----+----+-----+----+--------+
+     *      Result bites:    | MSb 31 | 30 | 29 | 28 | ... | 1  | LSb 0  |
+     *                       +--------+----+----+----+-----+----+--------+
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The signal-precision float-point value.
+     *  @param offset
+     *      The offset.
+     */
+    void write_float_backgrounds(const float value, const size_t offset = 0U);
+
+    /**
+     *  Write double-precision float-point in order as following:
+     * 
+     *                       +-------+---+---+---+-----+----+--------+
+     *      Source bites:    | LSb 0 | 1 | 2 | 3 | ... | 62 | MSb 63 |
+     *                       +-------+---+---+---+-----+----+--------+
+     *      Result bites:    | LSb 0 | 1 | 2 | 3 | ... | 62 | MSb 63 |
+     *                       +-------+---+---+---+-----+----+--------+
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The double-precision float-point value.
+     *  @param offset
+     *      The offset.
+     */
+    void write_double_forwards(const double value, const size_t offset = 0U);
+
+    /**
+     *  Write double-precision float-point in reverse order as following:
+     *          
+     *                       +--------+----+----+----+-----+----+--------+
+     *      Source bites:    | LSb 0  | 1  | 2  | 3  | ... | 62 | MSb 63 |
+     *                       +--------+----+----+----+-----+----+--------+
+     *      Result bites:    | MSb 63 | 62 | 61 | 60 | ... | 1  | LSb 0  |
+     *                       +--------+----+----+----+-----+----+--------+
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param value
+     *      The double-precision float-point value.
+     *  @param offset
+     *      The offset.
+     */
+    void write_double_backgrounds(const double value, const size_t offset = 0U);
 
     //
     //  Members.

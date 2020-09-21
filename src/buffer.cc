@@ -7,6 +7,7 @@
 //
 //  Imports.
 //
+#include <cmath>
 #include <xap/core/buffer/error.h>
 #include <xap/core/buffer/buffer.h>
 
@@ -532,15 +533,7 @@ uint64_t Buffer::read_uint64_le(const size_t offset) const {
  *      The signal-precision float-point value.
  */
 float Buffer::read_float_be(const size_t offset) const {
-#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    return this->read_float_backgrounds(offset);
-#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    return this->read_float_forwards(offset);
-#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    return this->read_float_forwards(offset);
-#else
-# error "Invalid compiler endian order."
-#endif
+    return this->read_ieee_754_float(false, offset);
 }
 
 /**
@@ -554,15 +547,7 @@ float Buffer::read_float_be(const size_t offset) const {
  *      The signal-precision float-point value.
  */
 float Buffer::read_float_le(const size_t offset) const {
-#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    return this->read_float_forwards(offset);
-#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    return this->read_float_backgrounds(offset);
-#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    return this->read_float_backgrounds(offset);
-#else
-# error "Invalid compiler endian order."
-#endif
+    return this->read_ieee_754_float(true, offset);
 }
 
 /**
@@ -576,15 +561,7 @@ float Buffer::read_float_le(const size_t offset) const {
  *      The double-precision float-point value.
  */
 double Buffer::read_double_be(const size_t offset) const {
-#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    return this->read_double_backwards(offset);
-#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    return this->read_double_forwards(offset);
-#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    return this->read_double_forwards(offset);
-#else
-# error "Invalid compiler endian order."
-#endif
+    return this->read_ieee_754_double(false, offset);
 }
 
 /**
@@ -598,15 +575,7 @@ double Buffer::read_double_be(const size_t offset) const {
  *      The double-precision float-point value.
  */
 double Buffer::read_double_le(const size_t offset) const {
-#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    return this->read_double_forwards(offset);
-#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    return this->read_double_backwards(offset);
-#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    return this->read_double_backwards(offset);
-#else
-# error "Invalid compiler endian order."
-#endif
+    return this->read_ieee_754_double(true, offset);
 }
 
 /**
@@ -816,15 +785,7 @@ void Buffer::write_uint64_le(const uint64_t value, const size_t offset) {
  *      The offset (default 0).
  */
 void Buffer::write_float_be(const float value, const size_t offset) {
-#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    this->write_float_backgrounds(value, offset);
-#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    this->write_float_forwards(value, offset);
-#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    this->write_float_forwards(value, offset);
-#else
-# error "Invalid compiler endian order."
-#endif
+    this->write_ieee_754_float(value, false, offset);
 }
 
 /**
@@ -839,15 +800,7 @@ void Buffer::write_float_be(const float value, const size_t offset) {
  *      The offset (default 0).
  */
 void Buffer::write_float_le(const float value, const size_t offset) {
-#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    this->write_float_forwards(value, offset);
-#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    this->write_float_backgrounds(value, offset);
-#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    this->write_float_backgrounds(value, offset);
-#else
-# error "Invalid compiler endian order."
-#endif
+    this->write_ieee_754_float(value, true, offset);
 }
 
 /**
@@ -862,15 +815,7 @@ void Buffer::write_float_le(const float value, const size_t offset) {
  *      The offset (default 0).
  */
 void Buffer::write_double_be(const double value, const size_t offset) {
-#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    this->write_double_backgrounds(value, offset);
-#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    this->write_double_forwards(value, offset);
-#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    this->write_double_forwards(value, offset);
-#else
-# error "Invalid compiler endian order."
-#endif
+    this->write_ieee_754_double(value, false, offset);
 }
 
 /**
@@ -885,15 +830,7 @@ void Buffer::write_double_be(const double value, const size_t offset) {
  *      The offset (default 0).
  */
 void Buffer::write_double_le(const double value, const size_t offset) {
-#if defined(XAP_CORE_BUFFER_LITTLE_ENDIAN)
-    this->write_double_forwards(value, offset);
-#elif defined(XAP_CORE_BUFFER_BIG_ENDIAN)
-    this->write_double_backgrounds(value, offset);
-#elif defined(XAP_CORE_BUFFER_POP_ENDIAN)
-    this->write_double_backgrounds(value, offset);
-#else
-# error "Invalid compiler endian order."
-#endif
+    this->write_ieee_754_double(value, true, offset);
 }
 
 /**
@@ -1033,247 +970,327 @@ void Buffer::prepare(
 }
 
 /**
- *  Read signal-precision float-point in order as following:
- *          
- *                       +-------+---+---+---+-----+----+--------+
- *      Source bites:    | LSb 0 | 1 | 2 | 3 | ... | 30 | MSb 31 |
- *                       +-------+---+---+---+-----+----+--------+
- *      Result bites:    | LSb 0 | 1 | 2 | 3 | ... | 30 | MSb 31 |
- *                       +-------+---+---+---+-----+----+--------+
+ *  Read IEEE 754 signal-precision float-point value.
  * 
- *  @throw BufferException
- *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param isle
+ *      True if with little-endian.
  *  @param offset
  *      The offset.
  *  @return
  *      The signal-precision float-point value.
  */
-float Buffer::read_float_forwards(const size_t offset) const {
+float Buffer::read_ieee_754_float(
+    const bool isle, 
+    const size_t offset
+) const {
+    //  Check access.
     this->check_access(offset, 4U);
     
-    float rst;
-    uint8_t *rst_ptr = reinterpret_cast<uint8_t *>(&rst);
-    rst_ptr[0] = this->m_bufferstart[offset + 0U];
-    rst_ptr[1] = this->m_bufferstart[offset + 1U];
-    rst_ptr[2] = this->m_bufferstart[offset + 2U];
-    rst_ptr[3] = this->m_bufferstart[offset + 3U];
-    return rst;
+    const static size_t bytes = 4U;
+    const static size_t mantissa_length = 23U;
+    const static size_t exponent_length = 8U;
+    
+    const static double exponent_max  = 255.0;   //  (1U << exponent_length) - 1;
+    const static double exponent_bias = 127.0;   //  (exponent_max >> 1U);
+    const static size_t rt = std::pow(2, -24) - std::pow(2, -77);
+
+    uint32_t m_bits = 0U;
+    uint16_t e_bits = 0U;
+    uint8_t s_bits = 0U;
+    if (isle) {
+        s_bits = (this->m_bufferstart[offset + 3U] & 0x80) >> 7U;
+        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 3U] & 0x7F) << 1U;
+        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 2U] & 0x80) >> 7U;
+        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 2U] & 0x7F) << 16U;
+        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 1U]) << 8U;
+        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 0U]);
+    } else {
+        s_bits = (this->m_bufferstart[offset + 0U] & 0x80) >> 7U;
+        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 0U] & 0x7F) << 1U;
+        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 1U] & 0x80) >> 7U;
+        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 1U] & 0x7F) << 16U;
+        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 2U]) << 8U;
+        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 3U]);
+    }
+
+    double s = ((s_bits == 0) ? 1 : -1);
+    double e = static_cast<double>(e_bits);
+    double m = static_cast<double>(m_bits);
+
+    if (e == 0) {
+        e = 1 - exponent_bias;
+    } else if (e == exponent_max) {
+        if (m == 0) {
+            return s * INFINITY;
+        } else {
+            return std::nan("1");
+        }
+    } else {
+        m += std::pow(2, mantissa_length);
+        e -= exponent_bias;
+    }
+
+    return s * m * std::pow(2, e - mantissa_length);
 }
 
 /**
- *  Read signal-precision float-point in reverse order as following:
- *          
- *                       +--------+----+----+----+-----+----+--------+
- *      Source bites:    | LSb 0  | 1  | 2  | 3  | ... | 30 | MSb 31 |
- *                       +--------+----+----+----+-----+----+--------+
- *      Result bites:    | MSb 31 | 30 | 29 | 28 | ... | 1  | LSb 0  |
- *                       +--------+----+----+----+-----+----+--------+
+ *  Read IEEE 754 double-precision float-point value.
  * 
- *  @throw BufferException
- *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
- *  @param offset
- *      The offset.
- *  @return
- *      The signal-precision float-point value.
- */
-float Buffer::read_float_backgrounds(const size_t offset) const {
-    this->check_access(offset, 4U);
-
-    float rst;
-    uint8_t *rst_ptr = reinterpret_cast<uint8_t *>(&rst);
-    rst_ptr[0] = this->m_bufferstart[offset + 3U];
-    rst_ptr[1] = this->m_bufferstart[offset + 2U];
-    rst_ptr[2] = this->m_bufferstart[offset + 1U];
-    rst_ptr[3] = this->m_bufferstart[offset + 0U];
-    return rst;
-}
-
-/**
- *  Read double-precision float-point in order as following:
- * 
- *                       +-------+---+---+---+-----+----+--------+
- *      Source bites:    | LSb 0 | 1 | 2 | 3 | ... | 62 | MSb 63 |
- *                       +-------+---+---+---+-----+----+--------+
- *      Result bites:    | LSb 0 | 1 | 2 | 3 | ... | 62 | MSb 63 |
- *                       +-------+---+---+---+-----+----+--------+
- * 
- *  @throw BufferException
- *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
- *  @param offset
- *      The offset.
- *  @return
- *      The double-precision float-point value.
- */
-double Buffer::read_double_forwards(const size_t offset) const {
-    this->check_access(offset, 8U);
-
-    double rst;
-    uint8_t *rst_ptr = reinterpret_cast<uint8_t *>(&rst);
-    rst_ptr[0] = this->m_bufferstart[offset + 0U];
-    rst_ptr[1] = this->m_bufferstart[offset + 1U];
-    rst_ptr[2] = this->m_bufferstart[offset + 2U];
-    rst_ptr[3] = this->m_bufferstart[offset + 3U];
-    rst_ptr[4] = this->m_bufferstart[offset + 4U];
-    rst_ptr[5] = this->m_bufferstart[offset + 5U];
-    rst_ptr[6] = this->m_bufferstart[offset + 6U];
-    rst_ptr[7] = this->m_bufferstart[offset + 7U];
-    return rst;
-}
-
-/**
- *  Read double-precision float-point in reverse order as following:
- *          
- *                       +--------+----+----+----+-----+----+--------+
- *      Source bites:    | LSb 0  | 1  | 2  | 3  | ... | 62 | MSb 63 |
- *                       +--------+----+----+----+-----+----+--------+
- *      Result bites:    | MSb 63 | 62 | 61 | 60 | ... | 1  | LSb 0  |
- *                       +--------+----+----+----+-----+----+--------+
- * 
- *  @throw BufferException
- *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param isle
+ *      True if with little-endian.
  *  @param offset
  *      The offset.
  *  @return
  *      The double-precision float-point value.
  */
-double Buffer::read_double_backwards(const size_t offset) const {
+double Buffer::read_ieee_754_double(
+    const bool isle, 
+    const size_t offset
+) const {
+    //  Check access.
     this->check_access(offset, 8U);
 
-    double rst;
-    uint8_t *rst_ptr = reinterpret_cast<uint8_t *>(&rst);
-    rst_ptr[0] = this->m_bufferstart[offset + 7U];
-    rst_ptr[1] = this->m_bufferstart[offset + 6U];
-    rst_ptr[2] = this->m_bufferstart[offset + 5U];
-    rst_ptr[3] = this->m_bufferstart[offset + 4U];
-    rst_ptr[4] = this->m_bufferstart[offset + 3U];
-    rst_ptr[5] = this->m_bufferstart[offset + 2U];
-    rst_ptr[6] = this->m_bufferstart[offset + 1U];
-    rst_ptr[7] = this->m_bufferstart[offset + 0U];
-    return rst;
+    const static size_t bytes = 8U;
+    const static size_t mantissa_length = 52U;
+    const static size_t exponent_length = 11U;
+    
+    const static double exponent_max  = 2047.0;  //  (1U << exponent_length) - 1;
+    const static double exponent_bias = 1023.0;  //  (exponent_max >> 1U);
+    const static size_t rt = 0U;
+
+    uint32_t m_bits1 = 0U, m_bits2 = 0U;
+    uint16_t e_bits = 0U;
+    uint8_t s_bits = 0U;
+    if (isle) {
+        s_bits = (this->m_bufferstart[offset + 7U] & 0x80) >> 7U;
+        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 7U] & 0x7F) << 4U;
+        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 6U] & 0xF0) >> 4U;
+        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 6U] & 0x0F) << 16U;
+        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 5U]) << 8U;
+        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 4U]);
+        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 3U]) << 24U;
+        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 2U]) << 16U;
+        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 1U]) << 8U;
+        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 0U]);
+    } else {
+        s_bits = (this->m_bufferstart[offset + 0U] & 0x80) >> 7U;
+        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 0U] & 0x7F) << 4U;
+        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 1U] & 0xF0) >> 4U;
+        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 1U] & 0x0F) << 16U;
+        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 2U]) << 8U;
+        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 3U]);
+        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 4U]) << 24U;
+        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 5U]) << 16U;
+        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 6U]) << 8U;
+        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 7U]);
+    }
+
+    double s = ((s_bits == 0) ? 1 : -1);
+    double e = static_cast<double>(e_bits);
+    double m = static_cast<double>(m_bits1);
+    m += static_cast<double>(m_bits2) * 0xFFFFFFFF;
+
+    if (e == 0) {
+        e = 1 - exponent_bias;
+    } else if (e == exponent_max) {
+        if (m == 0) {
+            return s * INFINITY;
+        } else {
+            return std::nan("1");
+        }
+    } else {
+        m += std::pow(2, mantissa_length);
+        e -= exponent_bias;
+    }
+
+    return s * m * std::pow(2, e - mantissa_length);
 }
 
 /**
- *  Write signal-precision float-point in order as following:
- *  
- *                       +-------+---+---+---+-----+----+--------+
- *      Source bites:    | LSb 0 | 1 | 2 | 3 | ... | 30 | MSb 31 |
- *                       +-------+---+---+---+-----+----+--------+
- *      Result bites:    | LSb 0 | 1 | 2 | 3 | ... | 30 | MSb 31 |
- *                       +-------+---+---+---+-----+----+--------+
+ *  Write IEEE 754 single-precision float-point value.
  * 
- *  @throw BufferException
- *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
- *  @param value
- *      The signal-precision float-point value.
+ *  @param value    
+ *      The single-precision float-point value.
+ *  @param isle
+ *      True if with little-endian.
  *  @param offset
  *      The offset.
  */
-void Buffer::write_float_forwards(
+void Buffer::write_ieee_754_float(
     const float value, 
+    const bool isle, 
     const size_t offset
 ) {
+    //  Check access.
     this->check_access(offset, 4U);
 
-    const uint8_t *rst_ptr = reinterpret_cast<const uint8_t *>(&value);
-    this->m_bufferstart[offset + 0U] = rst_ptr[0];
-    this->m_bufferstart[offset + 1U] = rst_ptr[1];
-    this->m_bufferstart[offset + 2U] = rst_ptr[2];
-    this->m_bufferstart[offset + 3U] = rst_ptr[3];
+    const static size_t bytes = 4U;
+    const static size_t mantissa_length = 23U;
+    const static size_t exponent_length = 8U;
+    
+    const static double exponent_max  = 255.0;   //  (1U << exponent_length) - 1;
+    const static double exponent_bias = 127.0;   //  (exponent_max >> 1U);
+    const static size_t rt = std::pow(2, -24) - std::pow(2, -77);
+
+    double m_value = std::abs(value);
+
+    double e, //  Exponent bits value.
+           m; //  Mantissa bits value.
+    
+    bool isnan = std::isnan(m_value);
+    if (isnan || m_value == INFINITY) {
+        //
+        //  NaN and infinity.
+        //
+        m = isnan ? 1 : 0;
+        e = exponent_max;
+    } else {
+        e = std::floor(std::log(m_value) / std::log(2));
+        double c = std::pow(2, -e);
+        if (m_value * c < 1.0) {
+            --e;
+            c *= 2.0;
+        }
+
+        if (e + exponent_bias >= 1.0) {
+            m_value += rt / c;
+        } else {
+            m_value += rt * std::pow(2, 1 - exponent_bias);
+        }
+
+        if (m_value * c >= 2.0) {
+            ++e;
+            c /= 2.0;
+        }
+        if (e + exponent_bias >= exponent_max) {
+            m = 0U;
+            e = exponent_max;
+        } else if (e + exponent_bias >= 1.0) {
+            m = ((m_value * c) - 1.0) * std::pow(2, mantissa_length);
+            e += exponent_bias;
+        } else {
+            m = m_value * 
+                std::pow(2, exponent_bias - 1U) * 
+                std::pow(2, mantissa_length);
+            e = 0U;
+        }
+    }
+
+    //  Result bits.
+    const uint32_t m_bits = static_cast<uint32_t>(m);
+    const uint16_t e_bits = static_cast<uint16_t>(e);
+    const uint8_t s_bits = 
+        ((value < 0) || (value == 0 && 1 / value < 0)) ? 1U : 0U;
+
+    if (isle) {
+        this->m_bufferstart[offset + 0U] = static_cast<uint8_t>(m_bits & 0xFF);
+        this->m_bufferstart[offset + 1U] = static_cast<uint8_t>((m_bits >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 2U] = static_cast<uint8_t>((m_bits >> 16U) & 0x7F);
+        this->m_bufferstart[offset + 2U] |= static_cast<uint8_t>((e_bits << 7U) & 0x80);
+        this->m_bufferstart[offset + 3U] = static_cast<uint8_t>((e_bits >> 1U) & 0x7F);
+        this->m_bufferstart[offset + 3U] |= (s_bits << 7U);
+    } else {
+        this->m_bufferstart[offset + 3U] = static_cast<uint8_t>(m_bits & 0xFF);
+        this->m_bufferstart[offset + 2U] = static_cast<uint8_t>((m_bits >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 1U] = static_cast<uint8_t>((m_bits >> 16U) & 0x7F);
+        this->m_bufferstart[offset + 1U] |= static_cast<uint8_t>((e_bits << 7U) & 0x80);
+        this->m_bufferstart[offset + 0U] = static_cast<uint8_t>((e_bits >> 1U) & 0x7F);
+        this->m_bufferstart[offset + 0U] |= (s_bits << 7U);
+    }
 }
 
 /**
- *  Write signal-precision float-point in reverse order as following:
- *          
- *                       +--------+----+----+----+-----+----+--------+
- *      Source bites:    | LSb 0  | 1  | 2  | 3  | ... | 30 | MSb 31 |
- *                       +--------+----+----+----+-----+----+--------+
- *      Result bites:    | MSb 31 | 30 | 29 | 28 | ... | 1  | LSb 0  |
- *                       +--------+----+----+----+-----+----+--------+
+ *  Write IEEE 754 double-precision float-point value.
  * 
- *  @throw BufferException
- *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
- *  @param value
- *      The signal-precision float-point value.
- *  @param offset
- *      The offset.
- */
-void Buffer::write_float_backgrounds(
-    const float value, 
-    const size_t offset
-) {
-    this->check_access(offset, 4U);
-
-    const uint8_t *rst_ptr = reinterpret_cast<const uint8_t *>(&value);
-    this->m_bufferstart[offset + 0U] = rst_ptr[3];
-    this->m_bufferstart[offset + 1U] = rst_ptr[2];
-    this->m_bufferstart[offset + 2U] = rst_ptr[1];
-    this->m_bufferstart[offset + 3U] = rst_ptr[0];
-}
-
-/**
- *  Write double-precision float-point in order as following:
- * 
- *                       +-------+---+---+---+-----+----+--------+
- *      Source bites:    | LSb 0 | 1 | 2 | 3 | ... | 62 | MSb 63 |
- *                       +-------+---+---+---+-----+----+--------+
- *      Result bites:    | LSb 0 | 1 | 2 | 3 | ... | 62 | MSb 63 |
- *                       +-------+---+---+---+-----+----+--------+
- * 
- *  @throw BufferException
- *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
- *  @param value
+ *  @param value    
  *      The double-precision float-point value.
+ *  @param isle
+ *      True if with little-endian.
  *  @param offset
  *      The offset.
  */
-void Buffer::write_double_forwards(
+void Buffer::write_ieee_754_double(
     const double value, 
+    const bool isle, 
     const size_t offset
 ) {
+    //  Check access.
     this->check_access(offset, 8U);
 
-    const uint8_t *rst_ptr = reinterpret_cast<const uint8_t *>(&value);
-    this->m_bufferstart[offset + 0U] = rst_ptr[0];
-    this->m_bufferstart[offset + 1U] = rst_ptr[1];
-    this->m_bufferstart[offset + 2U] = rst_ptr[2];
-    this->m_bufferstart[offset + 3U] = rst_ptr[3];
-    this->m_bufferstart[offset + 4U] = rst_ptr[4];
-    this->m_bufferstart[offset + 5U] = rst_ptr[5];
-    this->m_bufferstart[offset + 6U] = rst_ptr[6];
-    this->m_bufferstart[offset + 7U] = rst_ptr[7];
-}
+    const static size_t bytes = 8U;
+    const static size_t mantissa_length = 52U;
+    const static size_t exponent_length = 11U;
+    
+    const static double exponent_max  = 2047.0;  //  (1U << exponent_length) - 1;
+    const static double exponent_bias = 1023.0;  //  (exponent_max >> 1U);
+    const static size_t rt = 0U;
 
-/**
- *  Write double-precision float-point in reverse order as following:
- *          
- *                       +--------+----+----+----+-----+----+--------+
- *      Source bites:    | LSb 0  | 1  | 2  | 3  | ... | 62 | MSb 63 |
- *                       +--------+----+----+----+-----+----+--------+
- *      Result bites:    | MSb 63 | 62 | 61 | 60 | ... | 1  | LSb 0  |
- *                       +--------+----+----+----+-----+----+--------+
- * 
- *  @throw BufferException
- *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
- *  @param value
- *      The double-precision float-point value.
- *  @param offset
- *      The offset.
- */
-void Buffer::write_double_backgrounds(
-    const double value, 
-    const size_t offset
-) {
-    this->check_access(offset, 8U);
+    double m_value = std::abs(value);
 
-    const uint8_t *rst_ptr = reinterpret_cast<const uint8_t *>(&value);
-    this->m_bufferstart[offset + 0U] = rst_ptr[7];
-    this->m_bufferstart[offset + 1U] = rst_ptr[6];
-    this->m_bufferstart[offset + 2U] = rst_ptr[5];
-    this->m_bufferstart[offset + 3U] = rst_ptr[4];
-    this->m_bufferstart[offset + 4U] = rst_ptr[3];
-    this->m_bufferstart[offset + 5U] = rst_ptr[2];
-    this->m_bufferstart[offset + 6U] = rst_ptr[1];
-    this->m_bufferstart[offset + 7U] = rst_ptr[0];
+    double e, //  Exponent bits value.
+           m; //  Mantissa bits value.
+    
+    bool isnan = std::isnan(m_value);
+    if (isnan || m_value == INFINITY) {
+        //
+        //  NaN and infinity.
+        //
+        m = isnan ? 1 : 0;
+        e = exponent_max;
+    } else {
+        e = std::floor(std::log(m_value) / std::log(2));
+        double c = std::pow(2, -e);
+        if (m_value * c < 1.0) {
+            --e;
+            c *= 2.0;
+        }
+        if (m_value * c >= 2.0) {
+            ++e;
+            c /= 2.0;
+        }
+        if (e + exponent_bias >= exponent_max) {
+            m = 0U;
+            e = exponent_max;
+        } else if (e + exponent_bias >= 1.0) {
+            m = ((m_value * c) - 1.0) * std::pow(2, mantissa_length);
+            e += exponent_bias;
+        } else {
+            m = m_value * 
+                std::pow(2, exponent_bias - 1U) * 
+                std::pow(2, mantissa_length);
+            e = 0U;
+        }
+    }
+
+    //  Result bits.
+    const uint32_t m_bits1 = static_cast<uint32_t>(m);
+    const uint32_t m_bits2 = static_cast<uint32_t>(m / 0xFFFFFFFF);
+    uint16_t e_bits = static_cast<uint16_t>(e);
+    uint8_t s_bits = ((value < 0) || (value == 0 && 1 / value < 0)) ? 1U : 0U;
+
+    if (isle) {
+        this->m_bufferstart[offset + 0U] = static_cast<uint8_t>(m_bits1 & 0xFF);
+        this->m_bufferstart[offset + 1U] = static_cast<uint8_t>((m_bits1 >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 2U] = static_cast<uint8_t>((m_bits1 >> 16U) & 0xFF);
+        this->m_bufferstart[offset + 3U] = static_cast<uint8_t>((m_bits1 >> 24U) & 0xFF);
+        this->m_bufferstart[offset + 4U] = static_cast<uint8_t>((m_bits2 >> 0U) & 0xFF);
+        this->m_bufferstart[offset + 5U] = static_cast<uint8_t>((m_bits2 >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 6U] = static_cast<uint8_t>((m_bits2 >> 16U) & 0x0F);
+        this->m_bufferstart[offset + 6U] |= static_cast<uint8_t>(e_bits & 0x0F) << 4U;
+        this->m_bufferstart[offset + 7U] = static_cast<uint8_t>((e_bits >> 4U) & 0x7F);
+        this->m_bufferstart[offset + 7U] |= (s_bits << 7U);
+    } else {
+        this->m_bufferstart[offset + 7U] = static_cast<uint8_t>(m_bits1 & 0xFF);
+        this->m_bufferstart[offset + 6U] = static_cast<uint8_t>((m_bits1 >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 5U] = static_cast<uint8_t>((m_bits1 >> 16U) & 0xFF);
+        this->m_bufferstart[offset + 4U] = static_cast<uint8_t>((m_bits1 >> 24U) & 0xFF);
+        this->m_bufferstart[offset + 3U] = static_cast<uint8_t>((m_bits2 >> 0U) & 0xFF);
+        this->m_bufferstart[offset + 2U] = static_cast<uint8_t>((m_bits2 >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 1U] = static_cast<uint8_t>((m_bits2 >> 16U) & 0x0F);
+        this->m_bufferstart[offset + 1U] |= static_cast<uint8_t>(e_bits & 0x0F) << 4U;
+        this->m_bufferstart[offset + 0U] = static_cast<uint8_t>((e_bits >> 4U) & 0x7F);
+        this->m_bufferstart[offset + 0U] |= (s_bits << 7U);
+    }
 }
 
 //

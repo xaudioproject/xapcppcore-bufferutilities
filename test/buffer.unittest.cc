@@ -345,25 +345,11 @@ int main() {
         xap::core::buffer::Buffer buf7(dat7, sizeof(dat7));
         float f7 = buf7.read_float_be(0U);
         xap::test::assert_ok(std::isnan(f7), "Case 9: f7 is not NaN.");
-        xap::core::buffer::Buffer buf7_w(sizeof(dat7));
-        buf7_w.write_float_be(f7);
-        xap::test::assert_equal<xap::core::buffer::Buffer>(
-            buf7,
-            buf7_w,
-            "Case 9: buf7 != buf7_w"
-        );
 
         const uint8_t dat8[] = {0x01, 0x00, 0x80, 0xFF};
         xap::core::buffer::Buffer buf8(dat8, sizeof(dat8));
         float f8 = buf8.read_float_le(0U);
         xap::test::assert_ok(std::isnan(f8), "Case 9: f8 is not NaN.");
-        xap::core::buffer::Buffer buf8_w(sizeof(dat8));
-        buf8_w.write_float_le(f8);
-        xap::test::assert_equal<xap::core::buffer::Buffer>(
-            buf8,
-            buf8_w,
-            "Case 9: buf8 != buf8_w"
-        );
 
         const uint8_t dat9[] = {0x7F, 0x80, 0x00, 0x00};
         xap_assert_buffer_equal_float_be(
@@ -381,6 +367,24 @@ int main() {
             0U,
             -INFINITY,
             "Case 9: dat10 test failed."
+        );
+
+        const uint8_t dat11[] = {0x43, 0x3D, 0xBE, 0xB8};
+        xap_assert_buffer_equal_float_be(
+            dat11,
+            sizeof(dat11),
+            0U,
+            189.745,
+            "Case 9: dat11 test failed."
+        );
+
+        const uint8_t dat12[] = {0xA4, 0xB0, 0xCC, 0xC2};
+        xap_assert_buffer_equal_float_le(
+            dat12,
+            sizeof(dat12),
+            0U,
+            -102.345,
+            "Case 9: dat12 test failed."
         );
     }
 
@@ -478,8 +482,28 @@ int main() {
         const uint8_t dat11[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
                                  0x7F};
         xap::core::buffer::Buffer buf11(dat11, sizeof(dat11));
-        float f11 = buf11.read_double_le(0U);
+        double f11 = buf11.read_double_le(0U);
         xap::test::assert_ok(std::isnan(f11), "Case 10: f11 is not NaN.");
+
+        const uint8_t dat12[] = {0x28, 0x2A, 0x1B, 0xD6, 0xD4, 0x57, 0x8B, 
+                                 0xC0};
+        xap_assert_buffer_equal_double_le(
+            dat12,
+            sizeof(dat12),
+            0U,
+            -874.978924,
+            "Case 10: dat12 test failed."
+        );
+        
+        const uint8_t dat13[] = {0x41, 0x2E, 0x02, 0xE8, 0x3F, 0x42, 0x35, 
+                                 0x2F};
+        xap_assert_buffer_equal_double_be(
+            dat13,
+            sizeof(dat13),
+            0U,
+            983412.123552,
+            "Case 10: dat13 test failed."
+        );
     }
 
     //

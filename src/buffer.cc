@@ -1130,7 +1130,7 @@ void Buffer::write_ieee_754_float(
     
     const static double exponent_max  = 255.0;   //  (1U << exponent_length) - 1;
     const static double exponent_bias = 127.0;   //  (exponent_max >> 1U);
-    const static size_t rt = std::pow(2, -24) - std::pow(2, -77);
+    const static double rt = std::pow(2, -24) - std::pow(2, -77);
 
     double m_value = std::abs(value);
 
@@ -1223,7 +1223,7 @@ void Buffer::write_ieee_754_double(
     
     const static double exponent_max  = 2047.0;  //  (1U << exponent_length) - 1;
     const static double exponent_bias = 1023.0;  //  (exponent_max >> 1U);
-    const static size_t rt = 0U;
+    const static double rt = 0U;
 
     double m_value = std::abs(value);
 
@@ -1264,7 +1264,9 @@ void Buffer::write_ieee_754_double(
 
     //  Result bits.
     const uint32_t m_bits1 = static_cast<uint32_t>(m);
-    const uint32_t m_bits2 = static_cast<uint32_t>(m / 0xFFFFFFFF);
+    const uint32_t m_bits2 = static_cast<uint32_t>(
+        m / static_cast<double>(UINT32_MAX)
+    );
     uint16_t e_bits = static_cast<uint16_t>(e);
     uint8_t s_bits = ((value < 0) || (value == 0 && 1 / value < 0)) ? 1U : 0U;
 

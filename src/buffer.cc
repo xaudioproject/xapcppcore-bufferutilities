@@ -990,8 +990,8 @@ float Buffer::read_ieee_754_float(
     const static size_t mantissa_length = 23U;
     const static size_t exponent_length = 8U;
     
-    const static double exponent_max  = 255.0;   //  (1U << exponent_length) - 1;
-    const static double exponent_bias = 127.0;   //  (exponent_max >> 1U);
+    const static double exponent_max  = 255.0;  //  (1U << exponent_length) - 1;
+    const static double exponent_bias = 127.0;  //  (exponent_max >> 1U);
     const static size_t rt = std::pow(2, -24) - std::pow(2, -77);
 
     uint32_t m_bits = 0U;
@@ -999,18 +999,38 @@ float Buffer::read_ieee_754_float(
     uint8_t s_bits = 0U;
     if (isle) {
         s_bits = (this->m_bufferstart[offset + 3U] & 0x80) >> 7U;
-        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 3U] & 0x7F) << 1U;
-        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 2U] & 0x80) >> 7U;
-        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 2U] & 0x7F) << 16U;
-        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 1U]) << 8U;
-        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 0U]);
+        e_bits |= static_cast<uint16_t>(
+            this->m_bufferstart[offset + 3U] & 0x7F
+        ) << 1U;
+        e_bits |= static_cast<uint16_t>(
+            this->m_bufferstart[offset + 2U] & 0x80
+        ) >> 7U;
+        m_bits |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 2U] & 0x7F
+        ) << 16U;
+        m_bits |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 1U]
+        ) << 8U;
+        m_bits |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 0U]
+        );
     } else {
         s_bits = (this->m_bufferstart[offset + 0U] & 0x80) >> 7U;
-        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 0U] & 0x7F) << 1U;
-        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 1U] & 0x80) >> 7U;
-        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 1U] & 0x7F) << 16U;
-        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 2U]) << 8U;
-        m_bits |= static_cast<uint32_t>(this->m_bufferstart[offset + 3U]);
+        e_bits |= static_cast<uint16_t>(
+            this->m_bufferstart[offset + 0U] & 0x7F
+        ) << 1U;
+        e_bits |= static_cast<uint16_t>(
+            this->m_bufferstart[offset + 1U] & 0x80
+        ) >> 7U;
+        m_bits |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 1U] & 0x7F
+        ) << 16U;
+        m_bits |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 2U]
+        ) << 8U;
+        m_bits |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 3U]
+        );
     }
 
     double s = ((s_bits == 0) ? 1 : -1);
@@ -1054,35 +1074,73 @@ double Buffer::read_ieee_754_double(
     const static size_t mantissa_length = 52U;
     const static size_t exponent_length = 11U;
     
-    const static double exponent_max  = 2047.0;  //  (1U << exponent_length) - 1;
-    const static double exponent_bias = 1023.0;  //  (exponent_max >> 1U);
+    const static double exponent_max  = 2047.0; //  (1U << exponent_length) - 1;
+    const static double exponent_bias = 1023.0; //  (exponent_max >> 1U);
     const static size_t rt = 0U;
 
     uint32_t m_bits1 = 0U, m_bits2 = 0U;
     uint16_t e_bits = 0U;
     uint8_t s_bits = 0U;
     if (isle) {
-        s_bits = (this->m_bufferstart[offset + 7U] & 0x80) >> 7U;
-        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 7U] & 0x7F) << 4U;
-        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 6U] & 0xF0) >> 4U;
-        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 6U] & 0x0F) << 16U;
-        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 5U]) << 8U;
-        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 4U]);
-        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 3U]) << 24U;
-        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 2U]) << 16U;
-        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 1U]) << 8U;
-        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 0U]);
+        s_bits = (
+            this->m_bufferstart[offset + 7U] & 0x80
+        ) >> 7U;
+        e_bits |= static_cast<uint16_t>(
+            this->m_bufferstart[offset + 7U] & 0x7F
+        ) << 4U;
+        e_bits |= static_cast<uint16_t>(
+            this->m_bufferstart[offset + 6U] & 0xF0
+        ) >> 4U;
+        m_bits2 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 6U] & 0x0F
+        ) << 16U;
+        m_bits2 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 5U]
+        ) << 8U;
+        m_bits2 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 4U]
+        );
+        m_bits1 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 3U]
+        ) << 24U;
+        m_bits1 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 2U]
+        ) << 16U;
+        m_bits1 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 1U]
+        ) << 8U;
+        m_bits1 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 0U]
+        );
     } else {
         s_bits = (this->m_bufferstart[offset + 0U] & 0x80) >> 7U;
-        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 0U] & 0x7F) << 4U;
-        e_bits |= static_cast<uint16_t>(this->m_bufferstart[offset + 1U] & 0xF0) >> 4U;
-        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 1U] & 0x0F) << 16U;
-        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 2U]) << 8U;
-        m_bits2 |= static_cast<uint32_t>(this->m_bufferstart[offset + 3U]);
-        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 4U]) << 24U;
-        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 5U]) << 16U;
-        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 6U]) << 8U;
-        m_bits1 |= static_cast<uint32_t>(this->m_bufferstart[offset + 7U]);
+        e_bits |= static_cast<uint16_t>(
+            this->m_bufferstart[offset + 0U] & 0x7F
+        ) << 4U;
+        e_bits |= static_cast<uint16_t>(
+            this->m_bufferstart[offset + 1U] & 0xF0
+        ) >> 4U;
+        m_bits2 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 1U] & 0x0F
+        ) << 16U;
+        m_bits2 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 2U]
+        ) << 8U;
+        m_bits2 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 3U]
+        );
+        m_bits1 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 4U]
+        ) << 24U;
+        m_bits1 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 5U]
+        ) << 16U;
+        m_bits1 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 6U]
+        ) << 8U;
+        m_bits1 |= static_cast<uint32_t>(
+            this->m_bufferstart[offset + 7U]
+        );
     }
 
     double s = ((s_bits == 0) ? 1 : -1);
@@ -1128,8 +1186,8 @@ void Buffer::write_ieee_754_float(
     const static size_t mantissa_length = 23U;
     const static size_t exponent_length = 8U;
     
-    const static double exponent_max  = 255.0;   //  (1U << exponent_length) - 1;
-    const static double exponent_bias = 127.0;   //  (exponent_max >> 1U);
+    const static double exponent_max  = 255.0;  //  (1U << exponent_length) - 1;
+    const static double exponent_bias = 127.0;  //  (exponent_max >> 1U);
     const static double rt = std::pow(2, -24) - std::pow(2, -77);
 
     double m_value = std::abs(value);
@@ -1183,19 +1241,31 @@ void Buffer::write_ieee_754_float(
         ((value < 0) || (value == 0 && 1 / value < 0)) ? 1U : 0U;
 
     if (isle) {
-        this->m_bufferstart[offset + 0U] = static_cast<uint8_t>(m_bits & 0xFF);
-        this->m_bufferstart[offset + 1U] = static_cast<uint8_t>((m_bits >> 8U) & 0xFF);
-        this->m_bufferstart[offset + 2U] = static_cast<uint8_t>((m_bits >> 16U) & 0x7F);
-        this->m_bufferstart[offset + 2U] |= static_cast<uint8_t>((e_bits << 7U) & 0x80);
-        this->m_bufferstart[offset + 3U] = static_cast<uint8_t>((e_bits >> 1U) & 0x7F);
-        this->m_bufferstart[offset + 3U] |= (s_bits << 7U);
+        this->m_bufferstart[offset + 0U] = 
+            static_cast<uint8_t>(m_bits & 0xFF);
+        this->m_bufferstart[offset + 1U] = 
+            static_cast<uint8_t>((m_bits >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 2U] = 
+            static_cast<uint8_t>((m_bits >> 16U) & 0x7F);
+        this->m_bufferstart[offset + 2U] |= 
+            static_cast<uint8_t>((e_bits << 7U) & 0x80);
+        this->m_bufferstart[offset + 3U] = 
+            static_cast<uint8_t>((e_bits >> 1U) & 0x7F);
+        this->m_bufferstart[offset + 3U] |= 
+            (s_bits << 7U);
     } else {
-        this->m_bufferstart[offset + 3U] = static_cast<uint8_t>(m_bits & 0xFF);
-        this->m_bufferstart[offset + 2U] = static_cast<uint8_t>((m_bits >> 8U) & 0xFF);
-        this->m_bufferstart[offset + 1U] = static_cast<uint8_t>((m_bits >> 16U) & 0x7F);
-        this->m_bufferstart[offset + 1U] |= static_cast<uint8_t>((e_bits << 7U) & 0x80);
-        this->m_bufferstart[offset + 0U] = static_cast<uint8_t>((e_bits >> 1U) & 0x7F);
-        this->m_bufferstart[offset + 0U] |= (s_bits << 7U);
+        this->m_bufferstart[offset + 3U] = 
+            static_cast<uint8_t>(m_bits & 0xFF);
+        this->m_bufferstart[offset + 2U] = 
+            static_cast<uint8_t>((m_bits >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 1U] = 
+            static_cast<uint8_t>((m_bits >> 16U) & 0x7F);
+        this->m_bufferstart[offset + 1U] |= 
+            static_cast<uint8_t>((e_bits << 7U) & 0x80);
+        this->m_bufferstart[offset + 0U] = 
+            static_cast<uint8_t>((e_bits >> 1U) & 0x7F);
+        this->m_bufferstart[offset + 0U] |= 
+            (s_bits << 7U);
     }
 }
 
@@ -1221,8 +1291,8 @@ void Buffer::write_ieee_754_double(
     const static size_t mantissa_length = 52U;
     const static size_t exponent_length = 11U;
     
-    const static double exponent_max  = 2047.0;  //  (1U << exponent_length) - 1;
-    const static double exponent_bias = 1023.0;  //  (exponent_max >> 1U);
+    const static double exponent_max  = 2047.0; //  (1U << exponent_length) - 1;
+    const static double exponent_bias = 1023.0; //  (exponent_max >> 1U);
     const static double rt = 0U;
 
     double m_value = std::abs(value);
@@ -1271,27 +1341,47 @@ void Buffer::write_ieee_754_double(
     uint8_t s_bits = ((value < 0) || (value == 0 && 1 / value < 0)) ? 1U : 0U;
 
     if (isle) {
-        this->m_bufferstart[offset + 0U] = static_cast<uint8_t>(m_bits1 & 0xFF);
-        this->m_bufferstart[offset + 1U] = static_cast<uint8_t>((m_bits1 >> 8U) & 0xFF);
-        this->m_bufferstart[offset + 2U] = static_cast<uint8_t>((m_bits1 >> 16U) & 0xFF);
-        this->m_bufferstart[offset + 3U] = static_cast<uint8_t>((m_bits1 >> 24U) & 0xFF);
-        this->m_bufferstart[offset + 4U] = static_cast<uint8_t>((m_bits2 >> 0U) & 0xFF);
-        this->m_bufferstart[offset + 5U] = static_cast<uint8_t>((m_bits2 >> 8U) & 0xFF);
-        this->m_bufferstart[offset + 6U] = static_cast<uint8_t>((m_bits2 >> 16U) & 0x0F);
-        this->m_bufferstart[offset + 6U] |= static_cast<uint8_t>(e_bits & 0x0F) << 4U;
-        this->m_bufferstart[offset + 7U] = static_cast<uint8_t>((e_bits >> 4U) & 0x7F);
-        this->m_bufferstart[offset + 7U] |= (s_bits << 7U);
+        this->m_bufferstart[offset + 0U] = 
+            static_cast<uint8_t>(m_bits1 & 0xFF);
+        this->m_bufferstart[offset + 1U] = 
+            static_cast<uint8_t>((m_bits1 >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 2U] = 
+            static_cast<uint8_t>((m_bits1 >> 16U) & 0xFF);
+        this->m_bufferstart[offset + 3U] = 
+            static_cast<uint8_t>((m_bits1 >> 24U) & 0xFF);
+        this->m_bufferstart[offset + 4U] = 
+            static_cast<uint8_t>((m_bits2 >> 0U) & 0xFF);
+        this->m_bufferstart[offset + 5U] = 
+            static_cast<uint8_t>((m_bits2 >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 6U] = 
+            static_cast<uint8_t>((m_bits2 >> 16U) & 0x0F);
+        this->m_bufferstart[offset + 6U] |= 
+            static_cast<uint8_t>(e_bits & 0x0F) << 4U;
+        this->m_bufferstart[offset + 7U] = 
+            static_cast<uint8_t>((e_bits >> 4U) & 0x7F);
+        this->m_bufferstart[offset + 7U] |= 
+            (s_bits << 7U);
     } else {
-        this->m_bufferstart[offset + 7U] = static_cast<uint8_t>(m_bits1 & 0xFF);
-        this->m_bufferstart[offset + 6U] = static_cast<uint8_t>((m_bits1 >> 8U) & 0xFF);
-        this->m_bufferstart[offset + 5U] = static_cast<uint8_t>((m_bits1 >> 16U) & 0xFF);
-        this->m_bufferstart[offset + 4U] = static_cast<uint8_t>((m_bits1 >> 24U) & 0xFF);
-        this->m_bufferstart[offset + 3U] = static_cast<uint8_t>((m_bits2 >> 0U) & 0xFF);
-        this->m_bufferstart[offset + 2U] = static_cast<uint8_t>((m_bits2 >> 8U) & 0xFF);
-        this->m_bufferstart[offset + 1U] = static_cast<uint8_t>((m_bits2 >> 16U) & 0x0F);
-        this->m_bufferstart[offset + 1U] |= static_cast<uint8_t>(e_bits & 0x0F) << 4U;
-        this->m_bufferstart[offset + 0U] = static_cast<uint8_t>((e_bits >> 4U) & 0x7F);
-        this->m_bufferstart[offset + 0U] |= (s_bits << 7U);
+        this->m_bufferstart[offset + 7U] = 
+            static_cast<uint8_t>(m_bits1 & 0xFF);
+        this->m_bufferstart[offset + 6U] = 
+            static_cast<uint8_t>((m_bits1 >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 5U] = 
+            static_cast<uint8_t>((m_bits1 >> 16U) & 0xFF);
+        this->m_bufferstart[offset + 4U] = 
+            static_cast<uint8_t>((m_bits1 >> 24U) & 0xFF);
+        this->m_bufferstart[offset + 3U] = 
+            static_cast<uint8_t>((m_bits2 >> 0U) & 0xFF);
+        this->m_bufferstart[offset + 2U] = 
+            static_cast<uint8_t>((m_bits2 >> 8U) & 0xFF);
+        this->m_bufferstart[offset + 1U] = 
+            static_cast<uint8_t>((m_bits2 >> 16U) & 0x0F);
+        this->m_bufferstart[offset + 1U] |= 
+            static_cast<uint8_t>(e_bits & 0x0F) << 4U;
+        this->m_bufferstart[offset + 0U] = 
+            static_cast<uint8_t>((e_bits >> 4U) & 0x7F);
+        this->m_bufferstart[offset + 0U] |= 
+            (s_bits << 7U);
     }
 }
 

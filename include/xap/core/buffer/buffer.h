@@ -30,14 +30,6 @@ public:
     //
 
     /**
-     *  Construct (copy) the object.
-     * 
-     *  @param source
-     *      The source buffer.
-     */
-    Buffer(const Buffer &source);
-
-    /**
      *  Construct the object (, and initial all zero).
      * 
      *  @throw BufferException
@@ -45,7 +37,15 @@ public:
      *  @param length
      *      The length of buffer.
      */
-    Buffer(const size_t length);
+    Buffer(const size_t length = 0U);
+
+    /**
+     *  Construct (copy) the object.
+     * 
+     *  @param source
+     *      The source buffer.
+     */
+    Buffer(const Buffer &source);
 
     /**
      *  Construct the object.

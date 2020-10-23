@@ -249,7 +249,11 @@ Buffer Buffer::slice(const size_t offset) const {
  */
 Buffer Buffer::slice(const size_t offset, const size_t length) const {
     this->check_access(offset, length);
-    return Buffer(this->m_buffer, offset, length);
+    return Buffer(
+        this->m_buffer, 
+        (this->m_bufferstart - this->m_buffer.get()) + offset, 
+        length
+    );
 }
 
 /**

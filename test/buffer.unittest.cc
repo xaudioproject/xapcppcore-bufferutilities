@@ -192,15 +192,18 @@ int main() {
         "buf1.get_length() != sizeof(data)"
     );
 
-    //
-    //  Case 2.
-    //
-    xap::core::buffer::Buffer buf2 = buf1.slice(1U, 2U);
-    xap::core::buffer::Buffer buf3(data + 1U, 2U);
-    xap::test::assert_ok(
-        buf2 == buf3,
-        "buf2 != buf3"
-    );
+    {
+        //
+        //  Case 2.
+        //
+        xap::core::buffer::Buffer buf2 = buf1.slice(1U, 5U);
+        xap::core::buffer::Buffer buf3 = buf2.slice(1U, 4U);
+        xap::core::buffer::Buffer buf4(data + 2U, 4U);
+        xap::test::assert_ok(
+            buf3 == buf4,
+            "Case2: buf3 != buf4"
+        );
+    }
 
     //
     //  Case 3.

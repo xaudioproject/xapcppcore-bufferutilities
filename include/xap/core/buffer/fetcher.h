@@ -32,8 +32,6 @@ public:
     /**
      *  Cosntruct the object.
      * 
-     *  @throw BufferException
-     *      Raised if memory allocation was failed (XAPCORE_BUF_ERROR_ALLOC).
      *  @param buffer
      *      The buffer which would be fetched.
      */
@@ -128,12 +126,6 @@ public:
      * 
      *  @note
      *      Return zero-size buffer if fetcher is ended.
-     *  @throw BufferException
-     *      Raised in the following situations:
-     * 
-     *          - XAPCORE_BUF_ERROR_ALLOC: 
-     *              Raised if memory allocation was failed.
-     * 
      *  @return
      *      The destination buffer.
      */
@@ -143,13 +135,7 @@ public:
      *  Fetch bytes in buffer.
      * 
      *  @throw BufferException
-     *      Raised in the following situations:
-     * 
-     *          - XAPCORE_BUF_ERROR_OVERFLOW:
-     *              Parameter 'count' was out of range.
-     *          - XAPCORE_BUF_ERROR_ALLOC: 
-     *              Raised if memory allocation was failed.
-     * 
+     *      Parameter 'count' was out of range (XAPCORE_BUF_ERROR_OVERFLOW).
      *  @param count
      *      The count of bytes would be fetched.
      *  @return
@@ -181,8 +167,6 @@ public:
     /**
      *  Replace (reset) the fetch with another new buffer.
      * 
-     *  @throw BufferException
-     *      Raised if memory allocation was failed (XAPCORE_BUF_ERROR_ALLOC).
      *  @param new_buffer
      *      The buffer.
      */

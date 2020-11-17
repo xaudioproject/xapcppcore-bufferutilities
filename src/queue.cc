@@ -67,8 +67,6 @@ BufferQueue& BufferQueue::operator=(const BufferQueue &src) {
 /**
  *  Push buffer to queue.
  * 
- *  @throw BufferException
- *      Raised if memory allocation was failed (XAPCORE_BUF_ERROR_ALLOC).
  *  @param data
  *      The data.
  */
@@ -86,13 +84,8 @@ void BufferQueue::push(const Buffer &data) {
  *  Pop buffer from queue.
  * 
  *  @throw BufferException
- *      Raised in the following situations:
- *  
- *          - XAPCORE_BUF_ERROR_ALLOC:
- *              Raised if memory allocation was failed.
- *          - XAPCORE_BUF_ERROR_OVERFLOW:
- *              Raised if parameter 'size' was out of range.
- * 
+ *      Raised if parameter 'size' was out of range 
+ *      (XAPCORE_BUF_ERROR_OVERFLOW).
  *  @param size
  *      The size of buffer.
  *  @return
@@ -127,12 +120,6 @@ Buffer BufferQueue::pop(const size_t size) {
 
 /**
  *  Pop all data from queue.
- * 
- *  @throw BufferException
- *      Raised in the following situations:
- * 
- *          - XAPCORE_BUF_ERROR_ALLOC
- *              If memory allocation was failed.
  * 
  *  @return
  *      The buffer.

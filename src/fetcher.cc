@@ -17,21 +17,15 @@ namespace buffer {
 /**
  *  Cosntruct the object.
  * 
- *  @throw BufferException
- *      Raised if memory allocation was failed (XAPCORE_BUF_ERROR_ALLOC).
  *  @param buffer
  *      The buffer which would be fetched.
  */
 BufferFetcher::BufferFetcher(const Buffer &buffer) {
-    try {
-        Buffer *copied_buffer = new Buffer(buffer);
-        this->m_buffer_shared_pointer = std::shared_ptr<Buffer>(copied_buffer);
-        this->m_buffer = copied_buffer;
-        this->m_buffer_length = copied_buffer->get_length();
-        this->m_cursor = 0;
-    } catch (std::bad_alloc exception) {
-        throw BufferException("Bad alloc.", XAPCORE_BUF_ERROR_ALLOC);
-    }
+    Buffer *copied_buffer = new Buffer(buffer);
+    this->m_buffer_shared_pointer = std::shared_ptr<Buffer>(copied_buffer);
+    this->m_buffer = copied_buffer;
+    this->m_buffer_length = copied_buffer->get_length();
+    this->m_cursor = 0;
 }
 
 /**
@@ -167,12 +161,6 @@ size_t BufferFetcher::fetch_to(
  * 
  *  @note
  *      Return zero-size buffer if fetcher is ended.
- *  @throw BufferException
- *      Raised in the following situations:
- * 
- *          - XAPCORE_BUF_ERROR_ALLOC: 
- *              Raised if memory allocation was failed.
- * 
  *  @return
  *      The destination buffer.
  */
@@ -190,13 +178,7 @@ Buffer BufferFetcher::fetch_all() {
  *  Fetch bytes in buffer.
  * 
  *  @throw BufferException
- *      Raised in the following situations:
- * 
- *          - XAPCORE_BUF_ERROR_OVERFLOW:
- *              Parameter 'count' was out of range.
- *          - XAPCORE_BUF_ERROR_ALLOC: 
- *              Raised if memory allocation was failed.
- *      
+ *      Parameter 'count' was out of range (XAPCORE_BUF_ERROR_OVERFLOW).
  *  @param count
  *      The count of bytes would be fetched.
  *  @return
@@ -262,21 +244,15 @@ size_t BufferFetcher::get_remaining_size() const noexcept {
 /**
  *  Replace (reset) the fetch with another new buffer.
  * 
- *  @throw BufferException
- *      Raised if memory allocation was failed (XAPCORE_BUF_ERROR_ALLOC).
  *  @param new_buffer
  *      The buffer.
  */
 void BufferFetcher::replace(const Buffer &new_buffer) {
-    try {
-        Buffer *copied_buffer = new Buffer(new_buffer);
-        this->m_buffer_shared_pointer = std::shared_ptr<Buffer>(copied_buffer);
-        this->m_buffer = copied_buffer;
-        this->m_buffer_length = copied_buffer->get_length();
-        this->m_cursor = 0U;
-    } catch (std::bad_alloc &error) {
-        throw BufferException(error.what(), XAPCORE_BUF_ERROR_ALLOC);
-    }
+    Buffer *copied_buffer = new Buffer(new_buffer);
+    this->m_buffer_shared_pointer = std::shared_ptr<Buffer>(copied_buffer);
+    this->m_buffer = copied_buffer;
+    this->m_buffer_length = copied_buffer->get_length();
+    this->m_cursor = 0U;
 }
 
 //

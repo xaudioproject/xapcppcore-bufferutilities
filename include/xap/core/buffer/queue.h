@@ -60,8 +60,6 @@ public:
     /**
      *  Push buffer to queue.
      * 
-     *  @throw BufferException
-     *      Raised if memory allocation was failed (XAPCORE_BUF_ERROR_ALLOC).
      *  @param data
      *      The data.
      */
@@ -71,13 +69,8 @@ public:
      *  Pop buffer from queue.
      * 
      *  @throw BufferException
-     *      Raised in the following situations:
-     *  
-     *          - XAPCORE_BUF_ERROR_ALLOC:
-     *              Raised if memory allocation was failed.
-     *          - XAPCORE_BUF_ERROR_OVERFLOW:
-     *              Raised if parameter 'size' was out of range.
-     * 
+     *      Raised if parameter 'size' was out of range 
+     *      (XAPCORE_BUF_ERROR_OVERFLOW).
      *  @param size
      *      The size of buffer.
      *  @return
@@ -87,12 +80,6 @@ public:
     
     /**
      *  Pop all data from queue.
-     * 
-     *  @throw BufferException
-     *      Raised in the following situations:
-     * 
-     *          - XAPCORE_BUF_ERROR_ALLOC
-     *              If memory allocation was failed.
      * 
      *  @return
      *      The buffer.

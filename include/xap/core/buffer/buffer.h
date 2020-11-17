@@ -32,8 +32,6 @@ public:
     /**
      *  Construct the object (, and initial all zero).
      * 
-     *  @throw BufferException
-     *      Raised if memory allocation was failed.
      *  @param length
      *      The length of buffer.
      */
@@ -50,8 +48,6 @@ public:
     /**
      *  Construct the object.
      * 
-     *  @throw BufferException
-     *      Raised if memory alloction was failed (XAPCORE_BUF_ERROR_ALLOC).
      *  @param length
      *      The length of buffer.
      *  @param unsafe
@@ -62,8 +58,6 @@ public:
     /**
      *  Construct (copy) the object.
      * 
-     *  @throw BufferException
-     *      Raised if memory alloction was failed (XAPCORE_BUF_ERROR_ALLOC).
      *  @param data
      *      The source data.
      *  @param datalen
@@ -155,13 +149,8 @@ public:
      *  offset and cropped by the 'offset' indices.
      * 
      *  @throw BufferException
-     *      Raised in the follow situations:
-     *      
-     *          - XAPCORE_BUF_ERROR_OVERFLOW: 
-     *              Raised if 'offset' and 'length' is out of range.
-     *          - XAPCORE_BUF_ERROR_ALLOC: 
-     *              Raised if memory allocation was failed.
-     * 
+     *      Raised if 'offset' and 'length' is out of range 
+     *      (XAPCORE_BUF_ERROR_OVERFLOW).
      *  @param offset
      *      The offset.
      *  @return
@@ -174,13 +163,8 @@ public:
      *  offset and cropped by the 'offset' and 'length' indices.
      * 
      *  @throw BufferException
-     *      Raised in the follow situations:
-     *      
-     *          - XAPCORE_BUF_ERROR_OVERFLOW: 
-     *              Raised if 'offset' and 'length' is out of range.
-     *          - XAPCORE_BUF_ERROR_ALLOC: 
-     *              Raised if memory allocation was failed.
-     * 
+     *      Raised if 'offset' and 'length' is out of range 
+     *      (XAPCORE_BUF_ERROR_OVERFLOW).
      *  @param offset
      *      The offset.
      *  @param length
@@ -558,8 +542,6 @@ public:
      *  Return a new buffer which is the result of concatenating all buffer 
      *  instances in array together.
      * 
-     *  @throw BufferException
-     *      Raised if memory allocation was failed (XAPCORE_BUF_ERROR_ALLOC).
      *  @param buffers
      *      The buffer instances to concatenate.
      *  @param count

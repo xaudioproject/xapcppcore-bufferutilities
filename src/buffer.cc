@@ -47,69 +47,51 @@ Buffer::Buffer(const Buffer &source) {
 /**
  *  Construct the object (, and initial all zero).
  * 
- *  @throw BufferException
- *      Raised if memory allocation was failed (XAPCORE_BUF_ERROR_ALLOC).
  *  @param length
  *      The length of buffer.
  */
 Buffer::Buffer(const size_t length) {
-    try {
-        uint8_t *data;
-        if (length == 0U) {
-            data = new uint8_t[1];
-        } else {
-            data = new uint8_t[length];
-        }
-        std::shared_ptr<uint8_t> buffer(data, buffer_free_space);
-        this->prepare(buffer, 0U, length);
-        this->fill(0x00);
-    } catch (std::bad_alloc &error) {
-        throw BufferException(error.what(), XAPCORE_BUF_ERROR_ALLOC);
+    uint8_t *data;
+    if (length == 0U) {
+        data = new uint8_t[1];
+    } else {
+        data = new uint8_t[length];
     }
+    std::shared_ptr<uint8_t> buffer(data, buffer_free_space);
+    this->prepare(buffer, 0U, length);
+    this->fill(0x00);
 }
 
 /**
  *  Construct the object.
  * 
- *  @throw BufferException
- *      Raised if memory alloction was failed (XAPCORE_BUF_ERROR_ALLOC).
  *  @param length
  *      The length of buffer.
  *  @param unsafe
  *      True if not initialze with zero.
  */
 Buffer::Buffer(const size_t length, const bool unsafe) {
-    try {
-        uint8_t *data = new uint8_t[length];
-        std::shared_ptr<uint8_t> buffer(data, buffer_free_space);
-        this->prepare(buffer, 0U, length);
-        if (!unsafe) {
-            this->fill(0x00);
-        }
-    } catch (std::bad_alloc &error) {
-        throw BufferException(error.what(), XAPCORE_BUF_ERROR_ALLOC);
+    uint8_t *data = new uint8_t[length];
+    std::shared_ptr<uint8_t> buffer(data, buffer_free_space);
+    this->prepare(buffer, 0U, length);
+    if (!unsafe) {
+        this->fill(0x00);
     }
 }
 
 /**
  *  Construct (copy) the object.
  * 
- *  @throw BufferException
- *      Raised if memory alloction was failed (XAPCORE_BUF_ERROR_ALLOC).
  *  @param data
  *      The source data.
  *  @param datalen
  *      The length of source data.
  */
 Buffer::Buffer(const uint8_t *data, const size_t datalen) {
-    try {
-        uint8_t *inner = new uint8_t[datalen];
-        memcpy(inner, data, datalen);
-        std::shared_ptr<uint8_t> buffer(inner, buffer_free_space);
-        this->prepare(buffer, 0U, datalen);
-    } catch (std::bad_alloc &error) {
-        throw BufferException(error.what(), XAPCORE_BUF_ERROR_ALLOC);
-    }
+    uint8_t *inner = new uint8_t[datalen];
+    memcpy(inner, data, datalen);
+    std::shared_ptr<uint8_t> buffer(inner, buffer_free_space);
+    this->prepare(buffer, 0U, datalen);
 }
 
 /**
@@ -233,13 +215,8 @@ Buffer Buffer::slice(const size_t offset) const {
  *  offset and cropped by the 'offset' and 'length' indices.
  * 
  *  @throw BufferException
- *      Raised in the follow situations:
- *      
- *          - XAPCORE_BUF_ERROR_OVERFLOW: 
- *              Raised if 'offset' and 'length' is out of range.
- *          - XAPCORE_BUF_ERROR_ALLOC: 
- *              Raised if memory allocation was failed.
- * 
+ *      Raised if 'offset' and 'length' is out of range 
+ *      (XAPCORE_BUF_ERROR_OVERFLOW).
  *  @param offset
  *      The offset.
  *  @param length
@@ -871,8 +848,6 @@ bool Buffer::is_equal(
  *  Return a new buffer which is the result of concatenating all buffer 
  *  instances in array together.
  * 
- *  @throw BufferException
- *      Raised if memory allocation was failed (XAPCORE_BUF_ERROR_ALLOC).
  *  @param buffers
  *      The buffer instances to concatenate.
  *  @param count

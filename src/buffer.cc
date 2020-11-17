@@ -965,13 +965,13 @@ float Buffer::read_ieee_754_float(
     //  Check access.
     this->check_access(offset, 4U);
     
-    const static size_t bytes = 4U;
-    const static size_t mantissa_length = 23U;
-    const static size_t exponent_length = 8U;
+    static const size_t bytes = 4U;
+    static const size_t mantissa_length = 23U;
+    static const size_t exponent_length = 8U;
     
-    const static double exponent_max  = 255.0;  //  (1U << exponent_length) - 1;
-    const static double exponent_bias = 127.0;  //  (exponent_max >> 1U);
-    const static size_t rt = std::pow(2, -24) - std::pow(2, -77);
+    static const double exponent_max  = 255.0;  //  (1U << exponent_length) - 1;
+    static const double exponent_bias = 127.0;  //  (exponent_max >> 1U);
+    static const size_t rt = std::pow(2, -24) - std::pow(2, -77);
 
     uint32_t m_bits = 0U;
     uint16_t e_bits = 0U;
@@ -1049,13 +1049,13 @@ double Buffer::read_ieee_754_double(
     //  Check access.
     this->check_access(offset, 8U);
 
-    const static size_t bytes = 8U;
-    const static size_t mantissa_length = 52U;
-    const static size_t exponent_length = 11U;
+    static const size_t bytes = 8U;
+    static const size_t mantissa_length = 52U;
+    static const size_t exponent_length = 11U;
     
-    const static double exponent_max  = 2047.0; //  (1U << exponent_length) - 1;
-    const static double exponent_bias = 1023.0; //  (exponent_max >> 1U);
-    const static size_t rt = 0U;
+    static const double exponent_max  = 2047.0; //  (1U << exponent_length) - 1;
+    static const double exponent_bias = 1023.0; //  (exponent_max >> 1U);
+    static const size_t rt = 0U;
 
     uint32_t m_bits1 = 0U, m_bits2 = 0U;
     uint16_t e_bits = 0U;
@@ -1161,13 +1161,13 @@ void Buffer::write_ieee_754_float(
     //  Check access.
     this->check_access(offset, 4U);
 
-    const static size_t bytes = 4U;
-    const static size_t mantissa_length = 23U;
-    const static size_t exponent_length = 8U;
+    static const size_t bytes = 4U;
+    static const size_t mantissa_length = 23U;
+    static const size_t exponent_length = 8U;
     
-    const static double exponent_max  = 255.0;  //  (1U << exponent_length) - 1;
-    const static double exponent_bias = 127.0;  //  (exponent_max >> 1U);
-    const static double rt = std::pow(2, -24) - std::pow(2, -77);
+    static const double exponent_max  = 255.0;  //  (1U << exponent_length) - 1;
+    static const double exponent_bias = 127.0;  //  (exponent_max >> 1U);
+    static const double rt = std::pow(2, -24) - std::pow(2, -77);
 
     double m_value = std::abs(value);
 
@@ -1266,13 +1266,13 @@ void Buffer::write_ieee_754_double(
     //  Check access.
     this->check_access(offset, 8U);
 
-    const static size_t bytes = 8U;
-    const static size_t mantissa_length = 52U;
-    const static size_t exponent_length = 11U;
+    static const size_t bytes = 8U;
+    static const size_t mantissa_length = 52U;
+    static const size_t exponent_length = 11U;
     
-    const static double exponent_max  = 2047.0; //  (1U << exponent_length) - 1;
-    const static double exponent_bias = 1023.0; //  (exponent_max >> 1U);
-    const static double rt = 0U;
+    static const double exponent_max  = 2047.0; //  (1U << exponent_length) - 1;
+    static const double exponent_bias = 1023.0; //  (exponent_max >> 1U);
+    static const double rt = 0U;
 
     double m_value = std::abs(value);
 

@@ -23,8 +23,8 @@ namespace buffer {
 //
 
 //  Error code.
-const static uint16_t XAPCORE_BUF_ERROR           = 4000U;
-const static uint16_t XAPCORE_BUF_ERROR_OVERFLOW  = 4001U;
+static const uint16_t XAPCORE_BUF_ERROR           = 4000U;
+static const uint16_t XAPCORE_BUF_ERROR_OVERFLOW  = 4001U;
 
 //
 //  Classes.

@@ -34,3 +34,10 @@ _deps
 /build/*
 /lib/*
 !/lib/.placeholder
+
+# Visual Studio
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.dir
+Win32/

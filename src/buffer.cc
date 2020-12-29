@@ -8,6 +8,7 @@
 //  Imports.
 //
 #include <cmath>
+#include <algorithm>
 #include <xap/core/buffer/error.h>
 #include <xap/core/buffer/buffer.h>
 
@@ -971,7 +972,9 @@ float Buffer::read_ieee_754_float(
     
     static const double exponent_max  = 255.0;  //  (1U << exponent_length) - 1;
     static const double exponent_bias = 127.0;  //  (exponent_max >> 1U);
-    static const size_t rt = std::pow(2, -24) - std::pow(2, -77);
+    static const size_t rt = static_cast<size_t>(
+        std::pow(2, -24) - std::pow(2, -77)
+    );
 
     uint32_t m_bits = 0U;
     uint16_t e_bits = 0U;
@@ -1020,16 +1023,16 @@ float Buffer::read_ieee_754_float(
         e = 1 - exponent_bias;
     } else if (e == exponent_max) {
         if (m == 0) {
-            return s * INFINITY;
+            return static_cast<float>(s * INFINITY);
         } else {
-            return std::nan("1");
+            return static_cast<float>(std::nan("1"));
         }
     } else {
         m += std::pow(2, mantissa_length);
         e -= exponent_bias;
     }
 
-    return s * m * std::pow(2, e - mantissa_length);
+    return static_cast<float>(s * m * std::pow(2, e - mantissa_length));
 }
 
 /**

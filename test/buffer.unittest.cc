@@ -20,6 +20,28 @@
 //
 
 /**
+ *  Keep decimal point of double value.
+ * 
+ *  @param value
+ *      The source value.
+ *  @param decimal
+ *      The nubmer of decimal.
+ *  @returns
+ *      The result.
+ */
+double xap_set_double_percision(
+    double value, 
+    size_t decimal = 6
+) {
+    double power = static_cast<double>(std::pow(10, decimal));
+    value *= power;
+    value = std::floor(value);
+    value /= power;
+
+    return value;
+}
+
+/**
  *  Assert buffer read signal-precision float-point value with big-endian
  *  is equal to given float-point value.
  * 
@@ -109,18 +131,21 @@ void xap_assert_buffer_equal_float_le(
  *      The float-point value.
  *  @param message
  *      The message which would be shown if not equal.
+ *  @param percision
+ *      The number of remaining decimals for double value.
  */
 void xap_assert_buffer_equal_double_be(
     const uint8_t *data,
     const size_t datalen,
     const size_t offset,
     const double value,
-    const char *message = nullptr
+    const char *message = nullptr,
+    const size_t percision = 6
 ) {
     xap::core::buffer::Buffer buffer1(data, datalen);
-    xap::test::assert_equal<float>(
-        buffer1.read_double_be(offset),
-        value,
+    xap::test::assert_equal<double>(
+        xap_set_double_percision(buffer1.read_double_be(offset), percision),
+        xap_set_double_percision(value, percision),
         message
     );
 
@@ -156,9 +181,9 @@ void xap_assert_buffer_equal_double_le(
     const char *message = nullptr
 ) {
     xap::core::buffer::Buffer buffer1(data, datalen);
-    xap::test::assert_equal<float>(
-        buffer1.read_double_le(offset),
-        value,
+    xap::test::assert_equal<double>(
+        xap_set_double_percision(buffer1.read_double_le(offset)),
+        xap_set_double_percision(value),
         message
     );
 
@@ -169,13 +194,6 @@ void xap_assert_buffer_equal_double_le(
         buffer2,
         message
     );
-}
-
-void print_hex(const xap::core::buffer::Buffer &data) {
-    for (size_t i = 0; i < data.get_length(); ++i) {
-        printf("%02X", data[i]);
-    }
-    printf("\n");
 }
 
 //
@@ -377,7 +395,7 @@ int main() {
             dat11,
             sizeof(dat11),
             0U,
-            189.745,
+            static_cast<float>(189.745),
             "Case 9: dat11 test failed."
         );
 
@@ -386,7 +404,7 @@ int main() {
             dat12,
             sizeof(dat12),
             0U,
-            -102.345,
+            static_cast<float>(-102.345),
             "Case 9: dat12 test failed."
         );
     }
@@ -471,14 +489,14 @@ int main() {
         //  sNaN
         const uint8_t dat9[] = {0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
         xap::core::buffer::Buffer buf9(dat9, sizeof(dat9));
-        float f9 = buf9.read_double_be(0U);
+        double f9 = buf9.read_double_be(0U);
         xap::test::assert_ok(std::isnan(f9), "Case 10: f9 is not NaN.");
 
         //  qNaN
         const uint8_t dat10[] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF8, 
                                  0x7F};
         xap::core::buffer::Buffer buf10(dat10, sizeof(dat10));
-        float f10 = buf10.read_double_le(0U);
+        double f10 = buf10.read_double_le(0U);
         xap::test::assert_ok(std::isnan(f10), "Case 10: f10 is not NaN.");
 
         //  An alternative encoding of NaN
@@ -498,6 +516,11 @@ int main() {
             "Case 10: dat12 test failed."
         );
         
+        /**
+         *  WARN: There is a percision problem for 'Case 10: dat13 '.
+         * 
+         *        Set the number remaining decimals to 3.
+         */
         const uint8_t dat13[] = {0x41, 0x2E, 0x02, 0xE8, 0x3F, 0x42, 0x35, 
                                  0x2F};
         xap_assert_buffer_equal_double_be(
@@ -505,7 +528,8 @@ int main() {
             sizeof(dat13),
             0U,
             983412.123552,
-            "Case 10: dat13 test failed."
+            "Case 10: dat13 test failed.",
+            3
         );
     }
 

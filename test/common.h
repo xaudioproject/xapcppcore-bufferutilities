@@ -4,8 +4,8 @@
 //  found in the LICENSE.md file.
 //
 
-#ifndef COMMON_H__
-#define COMMON_H__
+#ifndef XAPTEST_COMMON_H__
+#define XAPTEST_COMMON_H__
 
 //
 //  Imports.
@@ -80,6 +80,7 @@ static void assert_throw(
         callback();
         assert_ok(false, message);
     } catch (Error &error) {
+        (void)error;
         //  Do nothing.
     } catch (...) {
         assert_ok(false, "Unexpected error occurred.");
@@ -108,4 +109,4 @@ static void assert_notthrow(
 }  //  namespace test
 }  //  namespace xap
 
-#endif  //  #ifndef COMMON_H__
+#endif  //  #ifndef XAPTEST_COMMON_H__

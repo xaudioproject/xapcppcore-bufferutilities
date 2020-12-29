@@ -7,7 +7,9 @@
 //
 //  Imports.
 //
+#include "build.h"
 #include "common.h"
+
 #include <xap/core/buffer/queue.h>
 #include <string>
 
@@ -23,9 +25,14 @@ void check_buffer_with_string(
         message
     );
 
-    std::string bufstr(buflen * 2U, true);
+    size_t bufstr_len = buflen * 2U;
+    std::string bufstr(bufstr_len, true);
     for (size_t i = 0; i < buflen; ++i) {
+#if defined(XAP_TEST_OS_WIN)
+        sprintf_s(&bufstr[i * 2U], 4U, "%02X", buf[i]);
+#else
         sprintf(&bufstr[i * 2U], "%02X", buf[i]);
+#endif
     }
     xap::test::assert_equal<std::string>(
         bufstr,

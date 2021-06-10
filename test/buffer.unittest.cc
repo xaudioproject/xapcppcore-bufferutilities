@@ -558,6 +558,11 @@ int main() {
             0x0102,
             "Case 11: expected_buf.read_uint16_le(3U) != 0x0102"
         );
+        xap::test::assert_equal<int16_t>(
+            excepted_buf.read_sint16_le(3U),
+            0x0102,
+            "Case 11: expected_buf.read_sint16_le(3U) != 0x0102"
+        );
     }
 
     //

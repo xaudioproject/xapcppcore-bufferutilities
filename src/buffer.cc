@@ -413,6 +413,24 @@ uint16_t Buffer::read_uint16_le(const size_t offset) const {
 }
 
 /**
+ *  Read a signed 16-bit integer with little-endian.
+ * 
+ *  @throw BufferException
+ *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+ *  @param offset
+ *      The offset.
+ *  @return
+ *      The signed 16-bit integer.
+ */
+int16_t Buffer::read_sint16_le(const size_t offset) const {
+    this->check_access(offset, 2U);
+    return static_cast<int16_t>(
+        (static_cast<int16_t>(this->m_bufferstart[offset + 1U]) << 8U) |
+        (static_cast<int16_t>(this->m_bufferstart[offset + 0U]))
+    );
+}
+
+/**
  *  Read an unsigned 32-bit integer with big-endian.
  * 
  *  @throw BufferException

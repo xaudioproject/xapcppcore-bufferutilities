@@ -280,6 +280,18 @@ public:
     uint16_t read_uint16_le(const size_t offset = 0U) const;
 
     /**
+     *  Read a signed 16-bit integer with little-endian.
+     * 
+     *  @throw BufferException
+     *      Raised if 'offset' is out of range (XAPCORE_BUF_ERROR_OVERFLOW).
+     *  @param offset
+     *      The offset.
+     *  @return
+     *      The signed 16-bit integer.
+     */
+    int16_t read_sint16_le(const size_t offset = 0U) const;
+
+    /**
      *  Read an unsigned 32-bit integer with big-endian.
      * 
      *  @throw BufferException

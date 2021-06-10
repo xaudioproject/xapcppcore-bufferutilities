@@ -10,6 +10,6 @@
 //
 //  Version.
 //
-#define XAP_CORE_BUFFER_VERSION "1.0.0-alpha8"
+#define XAP_CORE_BUFFER_VERSION "1.0.0-alpha9"
 
 #endif  //  #ifndef XAPCORE_BUFFER_VERSION_H__
